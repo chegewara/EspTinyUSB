@@ -36,7 +36,7 @@ class EspTinyUSB : Stream
 {
 public:
     EspTinyUSB(bool extPhy = false);
-    bool begin();
+    bool begin(char* str, uint8_t n);
     static void registerDeviceCallbacks(esp_tud_mount_cb _mount_cb = nullptr, esp_tud_umount_cb _umount_cb = nullptr,
                                         esp_tud_suspend_cb _suspend_cb = nullptr, esp_tud_resume_cb _resume_cb = nullptr);
 
@@ -47,6 +47,10 @@ public:
     void deviceID(uint16_t *, uint16_t *);
     void useDFU(bool);
     void useMSC(bool);
+    void manufacturer(char*);
+    void product(char*);
+    void serial(char*);
+    void revision(uint16_t);
 
     virtual int available(void) = 0;
     virtual int peek(void) = 0;
@@ -89,4 +93,5 @@ protected:
     static uint8_t ifIdx;
     static int total;
     static uint8_t count;
+    uint16_t _revision;
 };

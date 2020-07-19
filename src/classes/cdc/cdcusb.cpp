@@ -25,7 +25,7 @@ bool CDCusb::begin()
     EP++;
     EP++;
     count += 2;
-    if(!EspTinyUSB::begin()) return false;
+    if(!EspTinyUSB::begin("", 4)) return false;
     return true;
 }
 

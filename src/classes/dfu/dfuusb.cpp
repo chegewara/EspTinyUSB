@@ -17,7 +17,7 @@ bool DFUusb::begin()
     ESP_LOG_BUFFER_HEX("", dfu, sizeof(dfu));
     total += sizeof(dfu);
     count++;
-    if (!EspTinyUSB::begin()) return false;
+    if (!EspTinyUSB::begin("", 9)) return false;
     return true;
 }
 

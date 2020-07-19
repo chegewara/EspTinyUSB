@@ -8,7 +8,7 @@ class HIDusb : public EspTinyUSB
 {
 public:
     HIDusb();
-    bool begin();
+    bool begin(char* str);
     int available(void) { return -1; }
     int peek(void) { return -1; }
     int read(void) { return -1; }

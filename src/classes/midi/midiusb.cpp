@@ -17,7 +17,7 @@ bool MIDIusb::begin()
     memcpy(&desc_configuration[total], midi, sizeof(midi));
     total += sizeof(midi);
     count += 2;
-    return EspTinyUSB::begin();
+    return EspTinyUSB::begin("", 8);
 }
 
 void MIDIusb::noteON(uint8_t note, uint8_t velocity, uint8_t channel)

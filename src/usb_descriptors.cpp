@@ -83,7 +83,7 @@ tusb_desc_device_t EspTinyUSB::getDeviceDescriptor()
         .idVendor = _VID,
         .idProduct = _PID,
 
-        .bcdDevice = 0x100, // TODO add
+        .bcdDevice = _revision,
 
         .iManufacturer = 0x01,
         .iProduct = 0x02,

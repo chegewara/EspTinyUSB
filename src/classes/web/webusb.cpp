@@ -7,6 +7,7 @@ static bool web_serial_connected = false;
 static WebUSB *_webUSB = NULL;
 #define MS_OS_20_DESC_LEN 0xB2
 #define EPNUM_VENDOR 0x03
+#define _vendor  "Vendor class (webUSB)"
 
 // https://developers.google.com/web/fundamentals/native-hardware/build-for-webusb#microsoft_os_compatibility_descriptors
 uint8_t desc_ms_os_20[] = {
@@ -57,7 +58,7 @@ WebUSB::WebUSB(uint8_t itf)
     landingPageURI(url, true);
 }
 
-bool WebUSB::begin(const char *url, bool ssl)
+bool WebUSB::begin(const char *url, bool ssl, char* str)
 {
     if (url != nullptr)
         landingPageURI(url, ssl);
@@ -68,7 +69,9 @@ bool WebUSB::begin(const char *url, bool ssl)
     total += sizeof(vendor);
     count++;
 
-    return EspTinyUSB::begin();
+    if(str == nullptr)
+        str = _vendor;
+    return EspTinyUSB::begin(str, 7);
 }
 
 int WebUSB::available()

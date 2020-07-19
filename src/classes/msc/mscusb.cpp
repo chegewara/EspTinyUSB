@@ -16,6 +16,6 @@ bool MSCusb::begin()
     memcpy(&desc_configuration[total], msc, sizeof(msc));
     total += sizeof(msc);
     count++;
-    if (!EspTinyUSB::begin()) return false;
+    if (!EspTinyUSB::begin("", 5)) return false;
     return true;
 }
