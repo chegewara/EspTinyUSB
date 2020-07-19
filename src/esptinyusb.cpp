@@ -77,35 +77,82 @@ EspTinyUSB::EspTinyUSB(bool extPhy)
         gpio_set_drive_capability((gpio_num_t)USBPHY_DM_NUM, GPIO_DRIVE_CAP_3);
         isEnabled = true;
         _device = this;
+        _revision = 0x100;
     }
 }
 
 #define _manufacturer  "Espressif"
 #define _product  "Test device"
 #define _serial  "1234-5678"
+
+
 #define _cdc "CDC class"
 #define _dfu  "DFU class"
 #define _hid  "HID class"
 #define _midi  "MIDI class"
 #define _msc  "MSC class"
-#define _vendor  "Vendor class (webUSB)"
 
-bool EspTinyUSB::begin()
+void EspTinyUSB::manufacturer(char* str)
 {
-    descriptor_strings_t _strings = {
-        .langId = { 0x09, 0x04 },
-        .manufacturer = _manufacturer,
-        .product = _product,
-        .serial = _serial,
-        .cdc = _cdc,
-        .dfu = _dfu,
-        .hid = _hid,
-        .midi = _midi,
-        .msc = _msc,
-        .vendor = _vendor
-    };
+    strings.manufacturer = str;
+}
 
-    memcpy(&strings, &_strings, sizeof(strings));
+void EspTinyUSB::product(char* str)
+{
+    strings.product = str;
+}
+
+void EspTinyUSB::serial(char* str)
+{
+    strings.serial = str;
+}
+
+void EspTinyUSB::revision(uint16_t val)
+{
+    _revision = val;
+}
+
+bool EspTinyUSB::begin(char* str, uint8_t n)
+{
+    switch (n)
+    {
+        case 4:
+            strings.cdc = str;
+            break;
+        
+        case 5:
+            strings.msc = str;
+            break;
+        
+        case 6:
+            strings.hid = str;
+            break;
+        
+        case 7:
+            strings.vendor = str;
+            break;
+        
+        case 8:
+            strings.midi = str;
+            break;
+        
+        case 9:
+            strings.dfu = str;
+            break;
+        
+        default:
+            break;
+    }
+
+    strings.langId[0] = 0x09;
+    strings.langId[1] = 0x04;
+    if(!strings.manufacturer)
+        strings.manufacturer = _manufacturer;
+    if(!strings.product)
+        strings.product = _product;
+    if(!strings.serial)
+        strings.serial = _serial;
+
     getDeviceDescriptor();
     setDeviceDescriptorStrings();
     getConfigurationDescriptor();

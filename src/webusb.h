@@ -11,7 +11,7 @@ class WebUSB : public EspTinyUSB
 {
 public:
   WebUSB(uint8_t itf = 0);
-  bool begin(const char* url = nullptr, bool ssl = true);
+  bool begin(const char* url = nullptr, bool ssl = true, char* vendor = nullptr);
   int available(void);
   int peek(void);
   int read(void);

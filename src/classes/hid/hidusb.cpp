@@ -14,16 +14,14 @@ HIDusb::HIDusb()
 }
 
 uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GENERIC_INOUT(CFG_TUD_HID_BUFSIZE, HID_REPORT_ID(1))};
-bool HIDusb::begin()
+bool HIDusb::begin(char* str)
 {
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-    // uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_NONE, sizeof(desc_hid_report), 0x83, 16, 10)};
     uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80 | EPNUM_HID, CFG_TUD_HID_BUFSIZE, 10)};
-    ESP_LOG_BUFFER_HEX("A", desc_hid_report, sizeof(desc_hid_report));
     memcpy(&desc_configuration[total], hid, sizeof(hid));
     total += sizeof(hid);
     count++;
-    if (!EspTinyUSB::begin()) return false;
+    if (!EspTinyUSB::begin(str, 6)) return false;
     return true;
 }
 
@@ -70,8 +68,8 @@ void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uin
   (void) report_type;
 
   // echo back anything we received from host
-  tud_hid_report(report_id, buffer, bufsize);
-  Serial.println(bufsize);
+  // tud_hid_report(report_id, buffer, bufsize);
+  // Serial.println(bufsize);
   if(_hidUSB->_data_cb) {
     _hidUSB->_data_cb(report_id, (uint8_t)report_type, buffer, bufsize);
   }
