@@ -8,7 +8,7 @@ class HIDusb : public EspTinyUSB
 {
 public:
     HIDusb();
-    bool begin(char* str);
+    bool begin(char* str = nullptr);
     int available(void) { return -1; }
     int peek(void) { return -1; }
     int read(void) { return -1; }
@@ -16,8 +16,10 @@ public:
     void flush(void) { return; }
     size_t write(uint8_t);
     size_t write(const uint8_t *buffer, size_t size) { return 0; }
+    void setBaseEP(uint8_t);
 
     void onData(hid_on_data_t cb);
 
     hid_on_data_t _data_cb;
+    uint8_t _EPNUM_HID;
 };

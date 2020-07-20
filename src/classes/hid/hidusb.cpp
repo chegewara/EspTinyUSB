@@ -11,18 +11,25 @@ HIDusb::HIDusb()
 {
     enableHID = true;
     _hidUSB = this;
+    _EPNUM_HID = EPNUM_HID;
 }
 
 uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GENERIC_INOUT(CFG_TUD_HID_BUFSIZE, HID_REPORT_ID(1))};
 bool HIDusb::begin(char* str)
 {
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-    uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80 | EPNUM_HID, CFG_TUD_HID_BUFSIZE, 10)};
+    uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), _EPNUM_HID, 0x80 | _EPNUM_HID, CFG_TUD_HID_BUFSIZE, 10)};
     memcpy(&desc_configuration[total], hid, sizeof(hid));
     total += sizeof(hid);
     count++;
+
     if (!EspTinyUSB::begin(str, 6)) return false;
     return true;
+}
+
+void HIDusb::setBaseEP(uint8_t ep)
+{
+    _EPNUM_HID = ep;
 }
 
 void HIDusb::onData(hid_on_data_t cb)

@@ -9,15 +9,14 @@ DFUusb::DFUusb()
     enableDFU = true;
 }
 
-bool DFUusb::begin()
+bool DFUusb::begin(char* str)
 {
     // Interface number, string index, attributes, detach timeout, transfer size
     uint8_t dfu[] = {TUD_DFU_RT_DESCRIPTOR(ifIdx++, 9, 0x0f, 1000, 1024)};
     memcpy(&desc_configuration[total], dfu, sizeof(dfu));
-    ESP_LOG_BUFFER_HEX("", dfu, sizeof(dfu));
     total += sizeof(dfu);
     count++;
-    if (!EspTinyUSB::begin("", 9)) return false;
+    if (!EspTinyUSB::begin(str, 9)) return false;
     return true;
 }
 

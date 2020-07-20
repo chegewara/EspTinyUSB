@@ -47,10 +47,11 @@ public:
     void deviceID(uint16_t *, uint16_t *);
     void useDFU(bool);
     void useMSC(bool);
-    void manufacturer(char*);
-    void product(char*);
-    void serial(char*);
-    void revision(uint16_t);
+    static void manufacturer(char*);
+    static void product(char*);
+    static void serial(char*);
+    static void revision(uint16_t);
+    virtual void setBaseEP(uint8_t) = 0;
 
     virtual int available(void) = 0;
     virtual int peek(void) = 0;
@@ -83,7 +84,7 @@ protected:
     static bool enableVENDOR;
     static bool enableDFU;
 
-    descriptor_strings_t strings;
+    static descriptor_strings_t strings;
     static uint8_t desc_configuration[500];
 
     char langId[2];
@@ -93,5 +94,6 @@ protected:
     static uint8_t ifIdx;
     static int total;
     static uint8_t count;
-    uint16_t _revision;
+    static uint16_t _revision;
+    static uint16_t _bcdUSB;
 };

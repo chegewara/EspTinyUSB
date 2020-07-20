@@ -11,7 +11,7 @@ class WebUSB : public EspTinyUSB
 {
 public:
   WebUSB(uint8_t itf = 0);
-  bool begin(const char* url = nullptr, bool ssl = true, char* vendor = nullptr);
+  bool begin(char* vendor = nullptr, const char* url = nullptr, bool ssl = true);
   int available(void);
   int peek(void);
   int read(void);
@@ -28,11 +28,13 @@ public:
   void landingPageURI(const char* url, bool ssl);
   void onData(usb_data_cb_t cb);
   usb_data_cb_t _data_cb;
+  void setBaseEP(uint8_t);
 
 private:
   // uint8_t _itf;
   friend bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request);
   friend bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request);
   uint8_t* _url;
+  uint8_t _EPNUM_VENDOR;
 
 };

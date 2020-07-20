@@ -8,16 +8,22 @@
 MIDIusb::MIDIusb()
 {
     enableMIDI = true;
+    _EPNUM_MIDI = EPNUM_MIDI;
 }
 
-bool MIDIusb::begin()
+void MIDIusb::setBaseEP(uint8_t ep)
+{
+    _EPNUM_MIDI = ep;
+}
+
+bool MIDIusb::begin(char* str)
 {
     // Interface number, string index, EP Out & EP In address, EP size
-    uint8_t midi[] = {TUD_MIDI_DESCRIPTOR(1, 8, EPNUM_MIDI, 0x80 | EPNUM_MIDI, (CFG_TUSB_RHPORT0_MODE & OPT_MODE_HIGH_SPEED) ? 512 : 64)};
+    uint8_t midi[] = {TUD_MIDI_DESCRIPTOR(1, 8, _EPNUM_MIDI, 0x80 | _EPNUM_MIDI, 64)};
     memcpy(&desc_configuration[total], midi, sizeof(midi));
     total += sizeof(midi);
     count += 2;
-    return EspTinyUSB::begin("", 8);
+    return EspTinyUSB::begin(str, 8);
 }
 
 void MIDIusb::noteON(uint8_t note, uint8_t velocity, uint8_t channel)

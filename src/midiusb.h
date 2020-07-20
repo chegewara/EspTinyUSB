@@ -8,7 +8,7 @@ class MIDIusb : public EspTinyUSB
 {
 public:
     MIDIusb();
-    bool begin();
+    bool begin(char* str = nullptr);
     int available(void);
     int peek(void) { return -1; }
     int read(void) { return -1; }
@@ -27,8 +27,10 @@ public:
     void programChange(uint8_t program, uint8_t channel = 0);
     void channelPresure(uint8_t presure, uint8_t channel = 0);
     void pitchChange(uint16_t value, uint8_t channel = 0);
+    void setBaseEP(uint8_t);
 
 private:
     uint8_t* _song;
     size_t _len;
+    uint8_t _EPNUM_MIDI;
 };

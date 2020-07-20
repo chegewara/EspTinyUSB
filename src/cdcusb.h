@@ -11,7 +11,7 @@ private:
 
 public:
     CDCusb(uint8_t itf = 0);
-    bool begin();
+    bool begin(char* str = nullptr);
     int available(void);
     int peek(void);
     int read(void);
@@ -19,6 +19,7 @@ public:
     void flush(void);
     size_t write(uint8_t);
     size_t write(const uint8_t *buffer, size_t size);
+    void setBaseEP(uint8_t);
 
     operator bool() const;
 
@@ -28,4 +29,6 @@ public:
 
     void onConnect(usb_connected_cb cb);
     void onData(usb_data_cb_t);
+
+    uint8_t _EPNUM_CDC;
 };

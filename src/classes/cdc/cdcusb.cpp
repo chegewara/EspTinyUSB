@@ -3,6 +3,8 @@
 #include "esptinyusb.h"
 #include "cdcusb.h"
 
+#define EPNUM_CDC   0x02
+
 static CDCusb *_CDCusb = NULL;
 
 CDCusb::CDCusb(uint8_t itf)
@@ -10,22 +12,24 @@ CDCusb::CDCusb(uint8_t itf)
     _itf = itf;
     _CDCusb = this;
     enableCDC = true;
+    _EPNUM_CDC = EPNUM_CDC;
 }
 
-bool CDCusb::begin()
+void CDCusb::setBaseEP(uint8_t ep)
 {
-    static uint8_t EP = 0x02;
-    uint8_t _epNot = 0x80 + EP - 1;
-    uint8_t _epOUT = 0x80 + EP;
+  _EPNUM_CDC = ep;
+}
+
+bool CDCusb::begin(char* str)
+{
     // Interface number, string index, EP notification address and size, EP data address (out, in) and size.
-    uint8_t cdc[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, _epNot, 8, EP, _epOUT, 64)};
+    uint8_t cdc[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, (0x80 | (_EPNUM_CDC - 1)), 8, _EPNUM_CDC, 0x80 | _EPNUM_CDC, 64)};
     memcpy(&desc_configuration[total], cdc, sizeof(cdc));
     total += sizeof(cdc);
     ifIdx += 2;
-    EP++;
-    EP++;
     count += 2;
-    if(!EspTinyUSB::begin("", 4)) return false;
+
+    if(!EspTinyUSB::begin(str, 4)) return false;
     return true;
 }
 

@@ -56,21 +56,25 @@ WebUSB::WebUSB(uint8_t itf)
     enableVENDOR = true;
     String url = String("www.tinyusb.org/examples/webusb-serial");
     landingPageURI(url, true);
+    _EPNUM_VENDOR = EPNUM_VENDOR;
 }
 
-bool WebUSB::begin(const char *url, bool ssl, char* str)
+void WebUSB::setBaseEP(uint8_t ep)
+{
+  _EPNUM_VENDOR = ep;
+}
+
+bool WebUSB::begin(char* str, const char *url, bool ssl)
 {
     if (url != nullptr)
         landingPageURI(url, ssl);
 
     // Interface number, string index, EP Out & IN address, EP size
-    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, 64)};
+    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, _EPNUM_VENDOR, 0x80 | _EPNUM_VENDOR, 64)};
     memcpy(&desc_configuration[total], vendor, sizeof(vendor));
     total += sizeof(vendor);
     count++;
-
-    if(str == nullptr)
-        str = _vendor;
+    _bcdUSB = 0x210;
     return EspTinyUSB::begin(str, 7);
 }
 
@@ -204,12 +208,15 @@ extern "C"
 
     uint8_t const *tud_descriptor_bos_cb(void)
     {
+        if(_webUSB == NULL) return nullptr;
+
         return desc_bos;
     }
 
     // Invoked when received VENDOR control request
     bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request)
     {
+        if(_webUSB == NULL) return false;
         // TODO add check if rhport != itf => ignore
         switch (request->bRequest)
         {
@@ -256,6 +263,7 @@ extern "C"
     // Invoked when DATA Stage of VENDOR's request is complete
     bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request)
     {
+        if(_webUSB == NULL) return false;
         (void)rhport;
         (void)request;
         Serial.println("DATA stage");

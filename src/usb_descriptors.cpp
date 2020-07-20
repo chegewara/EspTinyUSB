@@ -74,7 +74,7 @@ tusb_desc_device_t EspTinyUSB::getDeviceDescriptor()
     tusb_desc_device_t _descriptor_config = {
         .bLength = sizeof(_descriptor_config),
         .bDescriptorType = TUSB_DESC_DEVICE,
-        .bcdUSB = 0x0200,
+        .bcdUSB = _bcdUSB,
 
         .bDeviceClass = 0x00,
         .bDeviceSubClass = 0x00,
