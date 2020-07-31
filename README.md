@@ -14,7 +14,3 @@ Included few very simple examples to show how easy it can be to start with it, i
 
 
 Issues and PRs are welcome.
-
-This is last know arduino-esp32 commit that this library is working with:
-
-https://github.com/espressif/arduino-esp32/commit/38057d66adcca85be522170180da1220cabadceb
