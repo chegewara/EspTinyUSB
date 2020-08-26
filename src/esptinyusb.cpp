@@ -7,7 +7,7 @@
 #include "esp_log.h"
 
 #include "esptinyusb.h"
-#include "usbd.h"
+#include "device/usbd.h"
 #include "tusb.h"
 
 #define _manufacturer  "Espressif"

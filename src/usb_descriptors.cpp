@@ -14,7 +14,7 @@
 
 #include "esptinyusb.h"
 #include "usb_descriptors.h"
-#include "usbd.h"
+#include "device/usbd.h"
 #include "tusb.h"
 #include "esp_log.h"
 
