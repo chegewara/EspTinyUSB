@@ -43,10 +43,6 @@ size_t HIDusb::write(const uint8_t *buffer, size_t len) {
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 uint8_t const * tud_hid_descriptor_report_cb(void)
 {
-  log_w("sizeof(): %d", sizeof(_hidUSB->hid_report_desc));
-    uint8_t temp[EspTinyUSB::hid_report_desc_len];
-    memcpy(temp, _hidUSB->hid_report_desc, EspTinyUSB::hid_report_desc_len);
-  log_w("sizeof(): %d", sizeof(temp));
     return _hidUSB->hid_report_desc;
 }
 
