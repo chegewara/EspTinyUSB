@@ -4,7 +4,7 @@ Please don't expect too much from it, since it was meant to be excercise to lear
 Library allows to use few USB devices:
 - CDC, communication device class,
 - MSC, mass storage class,
-- HID, human interface device class, keyboard, mouse, generic IN/OUT,
+- HID, human interface device class: keyboard, mouse, gamepad, generic IN/OUT,
 - MIDI, musical instrument digital interface class,
 - DFU, device firmware update class,
 - WebUSB, its using vendor class to show webusb usage.
