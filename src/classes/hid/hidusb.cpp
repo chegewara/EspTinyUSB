@@ -14,22 +14,9 @@ HIDusb::HIDusb()
     _EPNUM_HID = EPNUM_HID;
 }
 
-uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GENERIC_INOUT(CFG_TUD_HID_BUFSIZE, HID_REPORT_ID(1))};
-bool HIDusb::begin(char* str)
-{
-    // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-    uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), _EPNUM_HID, 0x80 | _EPNUM_HID, CFG_TUD_HID_BUFSIZE, 10)};
-    memcpy(&desc_configuration[total], hid, sizeof(hid));
-    total += sizeof(hid);
-    count++;
-
-    if (!EspTinyUSB::begin(str, 6)) return false;
-    return true;
-}
-
 void HIDusb::setBaseEP(uint8_t ep)
 {
-    _EPNUM_HID = ep;
+  _EPNUM_HID = ep;
 }
 
 void HIDusb::onData(hid_on_data_t cb)
@@ -39,17 +26,28 @@ void HIDusb::onData(hid_on_data_t cb)
 
 size_t HIDusb::write(uint8_t _r) {
   uint8_t report = _r;
-  if(tud_hid_report(1, &report, 1)) return 1;
+  if(tud_hid_report(report_id, &report, 1)) return 1;
 
   return 0;
 }
 
+size_t HIDusb::write(const uint8_t *buffer, size_t len) {
+  if(tud_hid_report(report_id, buffer, len)) {
+    log_d("write hid: %s", (char*)buffer);
+    log_d("len: %d", len);
+  } else return -1;
+  return len;
+}
 
 // Invoked when received GET HID REPORT DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 uint8_t const * tud_hid_descriptor_report_cb(void)
 {
-    return desc_hid_report;
+  log_w("sizeof(): %d", sizeof(_hidUSB->hid_report_desc));
+    uint8_t temp[EspTinyUSB::hid_report_desc_len];
+    memcpy(temp, _hidUSB->hid_report_desc, EspTinyUSB::hid_report_desc_len);
+  log_w("sizeof(): %d", sizeof(temp));
+    return _hidUSB->hid_report_desc;
 }
 
 // Invoked when received GET_REPORT control request
@@ -63,6 +61,7 @@ uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type,
   (void) buffer;
   (void) reqlen;
 
+  log_w("%s", __func__);
   return 0;
 }
 
@@ -73,10 +72,8 @@ void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uin
   // This example doesn't use multiple report and report ID
   (void) report_id;
   (void) report_type;
+    log_d("tud_hid_set_report_cb: %d", report_id);
 
-  // echo back anything we received from host
-  // tud_hid_report(report_id, buffer, bufsize);
-  // Serial.println(bufsize);
   if(_hidUSB->_data_cb) {
     _hidUSB->_data_cb(report_id, (uint8_t)report_type, buffer, bufsize);
   }

@@ -7,7 +7,6 @@
 #include "esp_log.h"
 
 #include "esptinyusb.h"
-#include "usbd.h"
 #include "tusb.h"
 
 #define _manufacturer  "Espressif"
@@ -38,6 +37,7 @@ uint16_t EspTinyUSB::_PID = 0x0002;
 descriptor_strings_t EspTinyUSB::strings;
 uint16_t EspTinyUSB::_revision;
 uint16_t EspTinyUSB::_bcdUSB;
+size_t EspTinyUSB::hid_report_desc_len = 0;
 
 static esp_tud_mount_cb _mount_cb = nullptr;
 static esp_tud_umount_cb _umount_cb = nullptr;

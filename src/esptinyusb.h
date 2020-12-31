@@ -18,19 +18,19 @@ typedef void (*hid_on_data_t)(uint8_t report_id, uint8_t report_type, uint8_t co
 typedef struct 
 {
     char langId[2];
-    char *manufacturer;
-    char *product;
-    char *serial;
+    const char *manufacturer;
+    const char *product;
+    const char *serial;
 
-    char *cdc;
-    char *dfu;
-    char *hid;
-    char *midi;
-    char *msc;
-    char *vendor;
+    const char *cdc;
+    const char *dfu;
+    const char *hid;
+    const char *midi;
+    const char *msc;
+    const char *vendor;
 } descriptor_strings_t;
 
-static char *descriptor_str_config[11];
+static const char *descriptor_str_config[11];
 
 class EspTinyUSB : Stream
 {
@@ -39,6 +39,8 @@ public:
     bool begin(char* str, uint8_t n);
     static void registerDeviceCallbacks(esp_tud_mount_cb _mount_cb = nullptr, esp_tud_umount_cb _umount_cb = nullptr,
                                         esp_tud_suspend_cb _suspend_cb = nullptr, esp_tud_resume_cb _resume_cb = nullptr);
+
+    static size_t hid_report_desc_len;
 
     tusb_desc_device_t getDeviceDescriptor();
     void setDeviceDescriptorStrings();

@@ -14,13 +14,11 @@
 
 #include "esptinyusb.h"
 #include "usb_descriptors.h"
-#include "usbd.h"
 #include "tusb.h"
 #include "esp_log.h"
 
 #define USB_TUSB_PID (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) | _PID_MAP(DFU_RT, 5))
 
-// char* EspTinyUSB::descriptor_str_config[11];
 uint8_t* EspTinyUSB::descriptor_config = NULL;
 uint8_t* EspTinyUSB::descriptor_config_if = NULL;
 
@@ -29,7 +27,7 @@ uint8_t* EspTinyUSB::getConfigurationDescriptor()
 {
     int CONFIG_TOTAL_LEN = TUD_CONFIG_DESC_LEN + 
                         (int)enableCDC * TUD_CDC_DESC_LEN + (int)enableMSC * TUD_MSC_DESC_LEN +
-                        (int)enableHID * TUD_HID_INOUT_DESC_LEN + (int)enableVENDOR * TUD_VENDOR_DESC_LEN + 
+                        (int)enableHID * EspTinyUSB::hid_report_desc_len + (int)enableVENDOR * TUD_VENDOR_DESC_LEN + 
                         (int)enableMIDI * TUD_MIDI_DESC_LEN + (int)enableDFU * TUD_DFU_RT_DESC_LEN;
 
 
@@ -42,27 +40,24 @@ uint8_t* EspTinyUSB::getConfigurationDescriptor()
     }
     EspTinyUSB::descriptor_config_if = (uint8_t*)calloc(1, total);
     memcpy(EspTinyUSB::descriptor_config_if, desc_configuration, total);
-Serial.printf("descriptor => %d\n", total);
-ESP_LOG_BUFFER_HEX_LEVEL("", EspTinyUSB::descriptor_config_if, total, ESP_LOG_ERROR);
+    log_d("descriptor length: %d\n", total);
 
     return EspTinyUSB::descriptor_config_if;
 }
 
 void EspTinyUSB::setDeviceDescriptorStrings()
 {
-    descriptor_str_config[0] = strings.langId;    // 0: is supported language is English (0x0409)
+    descriptor_str_config[0] = strings.langId;       // 0: supported language is English (0x0409)
     descriptor_str_config[1] = strings.manufacturer; // 1: Manufacturer
     descriptor_str_config[2] = strings.product;      // 2: Product
     descriptor_str_config[3] = strings.serial;       // 3: Serials, should use chip ID
 
-    descriptor_str_config[4] = strings.cdc; // 4: CDC Interface
-    descriptor_str_config[5] = strings.msc; // 5: MSC Interface
-    descriptor_str_config[6] = strings.hid; // 6: HIDs
-    descriptor_str_config[7] = strings.vendor; // 7: Vendor
-    descriptor_str_config[8] = strings.midi; // 8: MIDI
-    descriptor_str_config[9] = strings.dfu; // 9: DFU
-
-    // return descriptor_str_config;
+    descriptor_str_config[4] = strings.cdc;          // 4: CDC Interface
+    descriptor_str_config[5] = strings.msc;          // 5: MSC Interface
+    descriptor_str_config[6] = strings.hid;          // 6: HIDs
+    descriptor_str_config[7] = strings.vendor;       // 7: Vendor
+    descriptor_str_config[8] = strings.midi;         // 8: MIDI
+    descriptor_str_config[9] = strings.dfu;          // 9: DFU
 }
 
 /**
@@ -136,7 +131,6 @@ uint8_t const *tud_descriptor_device_cb(void)
 uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 {
     (void)index; // for multiple configurations
-    // ESP_LOG_BUFFER_HEX_LEVEL(__func__, EspTinyUSB::descriptor_config_if, 100, ESP_LOG_VERBOSE);
     return (uint8_t const*)EspTinyUSB::descriptor_config_if;
 }
 
@@ -153,8 +147,6 @@ static uint16_t _desc_str[32];
 uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
     uint8_t chr_count = 0;
-    ESP_LOGV("TAG", "index => %d", index);
-    ESP_LOG_BUFFER_HEX_LEVEL(__func__, descriptor_str_config[index], strlen(descriptor_str_config[index]), ESP_LOG_VERBOSE);
     if (index == 0)
     {
         memcpy(&_desc_str[1], descriptor_str_config[0], 2);
