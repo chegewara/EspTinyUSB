@@ -180,7 +180,10 @@ public:
     HIDkeyboard();
     bool begin(char* str = nullptr);
 
-    void sendKey(uint8_t _keycode, uint8_t modifier = 0);
-    void sendChar(uint8_t _keycode);
-    void sendString(char* _text);
+    bool sendKey(uint8_t _keycode, uint8_t modifier = 0);
+    bool sendChar(uint8_t _keycode);
+    bool sendPress(uint8_t _keycode, uint8_t modifier = 0);
+    bool sendRelease();
+    bool sendString(const char* text);
+    bool sendString(String text);
 };

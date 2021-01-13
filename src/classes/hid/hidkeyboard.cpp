@@ -16,7 +16,7 @@ static uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_KEYBOARD(HID_REPOR
 bool HIDkeyboard::begin(char *str)
 {
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-  uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_NONE, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 1)};
+  uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 1)};
   memcpy(&desc_configuration[total], hid, sizeof(hid));
   total += sizeof(hid);
   count++;
@@ -29,33 +29,52 @@ bool HIDkeyboard::begin(char *str)
   return EspTinyUSB::begin(str, 6);
 }
 
-void HIDkeyboard::sendKey(uint8_t _keycode, uint8_t modifier)
+bool HIDkeyboard::sendKey(uint8_t _keycode, uint8_t modifier)
 {
   /*------------- Keyboard -------------*/
-  if (tud_hid_n_ready(0))
+  if (tud_hid_ready())
   {
-    uint8_t keycode[6] = {0};
-    keycode[0] = _keycode;
-
-    tud_hid_keyboard_report(REPORT_ID, modifier, keycode);
-    delay(2);
-    // send empty key report if previously has key pressed
-    tud_hid_keyboard_report(REPORT_ID, 0, NULL);
+    if(sendPress(_keycode, modifier)) {
+      delay(2);
+      return sendRelease();
+    }
   }
+  return false;
 }
 
-void HIDkeyboard::sendChar(uint8_t _keycode)
+bool HIDkeyboard::sendChar(uint8_t _keycode)
 {
-  sendKey(keymap[_keycode].usage, keymap[_keycode].modifier);
+  return sendKey(keymap[_keycode].usage, keymap[_keycode].modifier);
 }
 
-void HIDkeyboard::sendString(char* _text)
+bool HIDkeyboard::sendPress(uint8_t _keycode, uint8_t modifier)
 {
-  int t = strlen((char*)_text);
+  uint8_t keycode[6] = {0};
+  keycode[0] = _keycode;
+
+  return tud_hid_keyboard_report(REPORT_ID, modifier, keycode);
+}
+
+bool HIDkeyboard::sendRelease()
+{
+  // send empty key report if previously has key pressed
+  return tud_hid_keyboard_report(REPORT_ID, 0, NULL);
+}
+
+bool HIDkeyboard::sendString(const char* _text)
+{
+  size_t len = strlen(_text);
   uint8_t keycode;
-  for(int i; i < t; i++) {
-    delay(2);
+  for(size_t i = 0; i < len; i++) {
     keycode = (uint8_t) _text[i];
-    sendKey(keymap[keycode].usage, keymap[keycode].modifier);
+    if(!sendKey(keymap[keycode].usage, keymap[keycode].modifier)) return false;
+    delay(2);
   }
+
+  return true;
+}
+
+bool HIDkeyboard::sendString(String text)
+{
+  return sendString(text.c_str());
 }

@@ -28,5 +28,9 @@ void setup()
 void loop()
 {
     delay(1000);
-    dev.pressKey(HID_KEY_A);
+    dev.sendKey(HID_KEY_A);
+    delay(1000);
+    Serial.println(dev.sendString(String("123456789\n"))?"OK":"FAIL");
+    delay(1000);
+    Serial.println(dev.sendString(String("abcdefghijklmnopqrst Uvwxyz\n"))?"OK":"FAIL");
 }

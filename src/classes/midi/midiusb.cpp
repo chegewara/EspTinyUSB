@@ -28,13 +28,13 @@ bool MIDIusb::begin(char* str)
 
 void MIDIusb::noteON(uint8_t note, uint8_t velocity, uint8_t channel)
 {
-    Serial.printf("ON: %d\n", note);
+    log_v("ON: %d\n", note);
     tudi_midi_write24(channel, 0x90, note, velocity);
 }
 
 void MIDIusb::noteOFF(uint8_t note, uint8_t velocity, uint8_t channel)
 {
-    Serial.printf("OFF: %d\n", note);
+    log_v("OFF: %d\n", note);
     tudi_midi_write24(channel, 0x80, note, velocity);
 }
 
@@ -84,7 +84,7 @@ bool MIDIusb::setSong(uint8_t *song, size_t len)
     {
         _song = (uint8_t*)strstr((char*)song, "MThd");
         memcpy(&mthd, _song, sizeof(mthd));
-        Serial.printf("MThd format => %d\n", mthd.format);
+        log_v("MThd format => %d\n", mthd.format);
         if(mthd.format > 0) return false;
     }
 
@@ -99,7 +99,7 @@ bool MIDIusb::setSong(uint8_t *song, size_t len)
     if(song == NULL) return false;
     song--;
 
-    Serial.printf("song => %x, i = %x\n", *(song), *song);
+    log_v("song => %x, i = %x\n", *(song), *song);
     _song = (uint8_t*)calloc(_len, 1);
     memcpy(_song, song, _len);
     return true;
@@ -131,7 +131,7 @@ uint8_t parseMeta(uint8_t* _song, size_t i)
         n = _song[i+2] + 3;
     }
 
-    Serial.printf("meta => %x, n = %x\n", _song[i+1], n - 1);
+    log_v("meta => %x, n = %x\n", _song[i+1], n - 1);
 
     return n - 1;
 }
@@ -141,48 +141,48 @@ void MIDIusb::playSong()
     uint8_t delta;
     uint8_t _byte;
     if(_song == nullptr) return;
-    Serial.println("play");
+    log_v("play");
 
     for (size_t i = 0; i < _len; i++)
     {
         delta = _song[i];
         _byte = _song[++i];
-        Serial.printf("delta => %x, _byte = %x\n", delta, _byte);
+        log_v("delta => %x, _byte = %x\n", delta, _byte);
         if(delta) delay(delta * 8);
         if ((_byte & 0xff) == 0xff){ // meta event
             i += parseMeta(_song, i);
         }
         else if ((_byte & 0xe0) == 0xe0){ // pitch wheel
             i += 2;
-            Serial.println("pitch");
+            log_v("pitch");
         }
         else if ((_byte & 0xd0) == 0xd0){ // pressure
             i += 1;
-            Serial.println("pressure");
+            log_v("pressure");
         }
         else if ((_byte & 0xc0) == 0xc0){ // prog change
             i += 1;
-            Serial.println("prog");
+            log_v("prog");
         }
         else if ((_byte & 0xb0) == 0xb0){ // ctrl change
             controlChange(_song[i + 1], _song[i + 2]);
             i += 2;
-            Serial.println("ctrl");
+            log_v("ctrl");
         }
         else if ((_byte & 0xa0) == 0xa0){ // poly key
             polyKey(_song[i + 1], _song[i + 2]);
             i += 2;
-            Serial.println("poly");
+            log_v("poly");
         }
         else if ((_byte & 0x90) == 0x90){ // note on
             noteON(_song[i + 1], _song[i + 2]);
             i += 2;
-            Serial.println("on");
+            log_v("on");
         }
         else if ((_byte & 0x80) == 0x80){ // note off
             noteOFF(_song[i + 1], _song[i + 2]);
             i += 2;
-            Serial.println("off");
+            log_v("off");
         } else {
             Serial.printf("unknown: %d\n", _song[i]);
         }
@@ -192,7 +192,6 @@ void MIDIusb::playSong()
 void tud_midi_rx_cb(uint8_t itf)
 {
     uint8_t _mid[4] = {0};
-    Serial.println(__func__);
     if(tud_midi_receive(_mid)) {
       for (size_t i = 0; i < 4; i++)
       {
@@ -200,7 +199,7 @@ void tud_midi_rx_cb(uint8_t itf)
       }
       Serial.println();   
       tud_midi_read_flush();
-    } else Serial.println("failed to receive");
+    } else log_e("failed to receive");
 }
 
 int MIDIusb::available()

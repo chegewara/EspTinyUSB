@@ -266,7 +266,7 @@ extern "C"
         if(_webUSB == NULL) return false;
         (void)rhport;
         (void)request;
-        Serial.println("DATA stage");
+        log_v("vendor DATA stage completed");
 
         // nothing to do
         return true;
