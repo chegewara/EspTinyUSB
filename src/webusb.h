@@ -31,7 +31,6 @@ public:
   void setBaseEP(uint8_t);
 
 private:
-  // uint8_t _itf;
   friend bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request);
   friend bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request);
   uint8_t* _url;
