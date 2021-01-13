@@ -182,4 +182,5 @@ public:
 
     void sendKey(uint8_t _keycode, uint8_t modifier = 0);
     void sendChar(uint8_t _keycode);
+    void sendString(char* _text);
 };

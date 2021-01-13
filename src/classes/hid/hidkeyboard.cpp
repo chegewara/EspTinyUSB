@@ -48,3 +48,14 @@ void HIDkeyboard::sendChar(uint8_t _keycode)
 {
   sendKey(keymap[_keycode].usage, keymap[_keycode].modifier);
 }
+
+void HIDkeyboard::sendString(char* _text)
+{
+  int t = strlen((char*)_text);
+  uint8_t keycode;
+  for(int i; i < t; i++) {
+    delay(2);
+    keycode = (uint8_t) _text[i];
+    sendKey(keymap[keycode].usage, keymap[keycode].modifier);
+  }
+}
