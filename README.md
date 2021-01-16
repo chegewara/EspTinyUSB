@@ -23,9 +23,9 @@ Set up a new layout:
 
 You can use:
 
-    kbd_en_us
-    kbd_es_es
-    kbd_it_it
+    **kbd_en_us**
+    **kbd_es_es**
+    **kbd_it_it**
 
     2.- Save and close hidkeyboard.cpp
 
@@ -35,7 +35,7 @@ You can use:
 
 You can change the keymaps:
 
-* **ES_US:** EspTinyUSB/src/classes/hid/en_us.h
+* **EN_US:** EspTinyUSB/src/classes/hid/en_us.h
 * **ES_ES:** EspTinyUSB/src/classes/hid/es_es.h
 * **IT_IT:** EspTinyUSB/src/classes/hid/it_it.h
 
