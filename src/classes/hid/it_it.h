@@ -1,21 +1,16 @@
+#ifndef _kbd_lang
+#define _kbd_lang
 
-#include "hidusb.h"
+#define KEYMAP_SIZE (152)
 
-#pragma once
-
-typedef struct {
-	unsigned char usage;
-	unsigned char modifier;
-} KEYMAP;
-/* Modifiers */
-/*enum MODIFIER_KEY {
+enum MODIFIER_KEY {
 	KEY_CTRL = 1,
-	KEY_SHIFT = 2,
+	KEY_SHIFT = 0x02,
 	KEY_ALT = 4,
-};*/
+};
 
-/* US keyboard (as HID standard) */
-/*#define KEYMAP_SIZE (152)
+extern
+const KEYMAP keymap[KEYMAP_SIZE];
 
 const KEYMAP keymap[KEYMAP_SIZE] = {
     {0, 0},             // NUL 
@@ -52,20 +47,20 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0, 0},             // US  
     {0x2c, 0},          //   
     {0x1e, KEY_SHIFT},      // ! 
-    {0x34, KEY_SHIFT},      // " 
-    {0x20, KEY_SHIFT},      // # 
+    {0x1f, KEY_SHIFT},      // " 
+    {0x34, 0},      // # 
     {0x21, KEY_SHIFT},      // $ 
     {0x22, KEY_SHIFT},      // % 
-    {0x24, KEY_SHIFT},      // & 
-    {0x34, 0},          // ' 
-    {0x26, KEY_SHIFT},      // ( 
-    {0x27, KEY_SHIFT},      // ) 
-    {0x25, KEY_SHIFT},      // * 
-    {0x2e, KEY_SHIFT},      // + 
+    {0x23, KEY_SHIFT},      // & 
+    {0x2d, 0},          // ' 
+    {0x25, KEY_SHIFT},      // ( 
+    {0x26, KEY_SHIFT},      // ) 
+    {0x30, KEY_SHIFT},      // * 
+    {0x30, 0},      // + 
     {0x36, 0},          // , 
-    {0x2d, 0},          // - 
+    {0x38, 0},          // - 
     {0x37, 0},          // . 
-    {0x38, 0},          // / 
+    {0x24, 0},          // / 
     {0x27, 0},          // 0 
     {0x1e, 0},          // 1 
     {0x1f, 0},          // 2 
@@ -76,13 +71,13 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0x24, 0},          // 7 
     {0x25, 0},          // 8 
     {0x26, 0},          // 9 
-    {0x33, KEY_SHIFT},      // : 
-    {0x33, 0},          // ; 
-    {0x36, KEY_SHIFT},      // < 
-    {0x2e, 0},          // = 
-    {0x37, KEY_SHIFT},      // > 
-    {0x38, KEY_SHIFT},      // ? 
-    {0x1f, KEY_SHIFT},      // @ 
+    {0x37, KEY_SHIFT},      // : 
+    {0x36, KEY_SHIFT},          // ; 
+    {0x64, 0},      // < 
+    {0x27, KEY_SHIFT},          // = 
+    {0x64, KEY_SHIFT},      // > 
+    {0x2d, KEY_SHIFT},      // ? 
+    {0x33, 0},      // @ 
     {0x04, KEY_SHIFT},      // A 
     {0x05, KEY_SHIFT},      // B 
     {0x06, KEY_SHIFT},      // C 
@@ -110,11 +105,11 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0x1c, KEY_SHIFT},      // Y 
     {0x1d, KEY_SHIFT},      // Z 
     {0x2f, 0},          // [ 
-    {0x31, 0},          // \ 
+    {0x35, 0},          // \ 
     {0x30, 0},          // ] 
-    {0x23, KEY_SHIFT},      // ^ 
-    {0x2d, KEY_SHIFT},      // _ 
-    {0x35, 0},          // ` 
+    {0x2e, KEY_SHIFT},      // ^ 
+    {0x38, KEY_SHIFT},      // _ 
+    {0x39, 0},          // ` 
     {0x04, 0},          // a 
     {0x05, 0},          // b 
     {0x06, 0},          // c 
@@ -142,9 +137,9 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0x1c, 0},          // y 
     {0x1d, 0},          // z 
     {0x2f, KEY_SHIFT},      // { 
-    {0x31, KEY_SHIFT},      // | 
+    {0x35, KEY_SHIFT},      // | 
     {0x30, KEY_SHIFT},      // } 
-    {0x35, KEY_SHIFT},      // ~ 
+    {0x34, 0},      // ~ 
     {0,0},              // DEL 
 
     {0x3a, 0},          // F1 
@@ -173,18 +168,5 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0x50, 0},          // LEFT_ARROW 
     {0x51, 0},          // DOWN_ARROW 
     {0x52, 0},          // UP_ARROW 
-};*/
-
-class HIDkeyboard : public HIDusb
-{
-public:
-    HIDkeyboard();
-    bool begin(char* str = nullptr);
-
-    bool sendKey(uint8_t _keycode, uint8_t modifier = 0);
-    bool sendChar(uint8_t _keycode);
-    bool sendPress(uint8_t _keycode, uint8_t modifier = 0);
-    bool sendRelease();
-    bool sendString(const char* text);
-    bool sendString(String text);
 };
+#endif

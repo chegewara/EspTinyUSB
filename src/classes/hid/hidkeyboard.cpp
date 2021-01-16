@@ -1,9 +1,20 @@
+#define kbd_en_us // Edit the layout, English layout by default. Example: #define kbd_es_es
 #include "Arduino.h"
 #include "tusb.h"
 
 #include "hidkeyboard.h"
 #define EPNUM_HID 0x02
 #define REPORT_ID 3
+
+#ifdef kbd_es_es
+#include "es_es.h"
+#endif
+#ifndef _kbd_lang
+#include "en_us.h"
+#endif
+#ifndef _kbd_lang
+#include "it_it.h"
+#endif
 
 HIDkeyboard::HIDkeyboard()
 {

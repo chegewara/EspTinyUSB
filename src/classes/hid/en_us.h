@@ -1,21 +1,16 @@
+#ifndef _kbd_lang
+#define _kbd_lang
 
-#include "hidusb.h"
+#define KEYMAP_SIZE (152)
 
-#pragma once
-
-typedef struct {
-	unsigned char usage;
-	unsigned char modifier;
-} KEYMAP;
-/* Modifiers */
-/*enum MODIFIER_KEY {
+enum MODIFIER_KEY {
 	KEY_CTRL = 1,
 	KEY_SHIFT = 2,
 	KEY_ALT = 4,
-};*/
+};
 
-/* US keyboard (as HID standard) */
-/*#define KEYMAP_SIZE (152)
+extern
+const KEYMAP keymap[KEYMAP_SIZE];
 
 const KEYMAP keymap[KEYMAP_SIZE] = {
     {0, 0},             // NUL 
@@ -173,18 +168,5 @@ const KEYMAP keymap[KEYMAP_SIZE] = {
     {0x50, 0},          // LEFT_ARROW 
     {0x51, 0},          // DOWN_ARROW 
     {0x52, 0},          // UP_ARROW 
-};*/
-
-class HIDkeyboard : public HIDusb
-{
-public:
-    HIDkeyboard();
-    bool begin(char* str = nullptr);
-
-    bool sendKey(uint8_t _keycode, uint8_t modifier = 0);
-    bool sendChar(uint8_t _keycode);
-    bool sendPress(uint8_t _keycode, uint8_t modifier = 0);
-    bool sendRelease();
-    bool sendString(const char* text);
-    bool sendString(String text);
 };
+#endif
