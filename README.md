@@ -23,9 +23,9 @@ Set up a new layout:
 
 You can use:
 
-    **kbd_en_us**
-    **kbd_es_es**
-    **kbd_it_it**
+    kbd_en_us
+    kbd_es_es
+    kbd_it_it
 
     2.- Save and close hidkeyboard.cpp
 
