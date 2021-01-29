@@ -77,3 +77,9 @@ void loop()
         echo_all(Serial.read());
     }
 }
+/** 
+}
+While (USBSerial1.available())
+ Show on screen:(USBSerial1. Copy to phone storage)
+  Output:("device_");
+}
