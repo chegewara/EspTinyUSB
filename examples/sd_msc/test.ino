@@ -159,6 +159,7 @@ void testFileIO(fs::FS &fs, const char * path){
 void test()
 {
 
+    uint8_t cardType = SD.cardType();
     Serial.print("SD Card Type: ");
     if(cardType == CARD_MMC){
         Serial.println("MMC");
