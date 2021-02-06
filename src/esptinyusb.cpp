@@ -176,8 +176,8 @@ bool EspTinyUSB::begin(char* str, uint8_t n)
     }
 
     if(tusb_init()) {
-        ESP_LOGE("TAG", "failed to init");
-        return false;
+        ESP_LOGW("TAG", "failed to init, (return fixed in tinyusb 0.8.0)");
+        // return false;
     }
 
     if (usbTaskHandle != nullptr) {

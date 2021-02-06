@@ -214,13 +214,17 @@ extern "C"
     }
 
     // Invoked when received VENDOR control request
-    bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request)
+    bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request)
     {
         if(_webUSB == NULL) return false;
-        // TODO add check if rhport != itf => ignore
-        switch (request->bRequest)
-        {
+    // nothing to with DATA & ACK stage
+    if (stage != CONTROL_STAGE_SETUP ) return true;
+
+    switch (request->bRequest)
+    {
         case VENDOR_REQUEST_WEBUSB:
+        // match vendor request in BOS descriptor
+        // Get landing page url
             if (!_webUSB->_url)
                 return false;
             return tud_control_xfer(rhport, request, (void *)_webUSB->_url, _webUSB->_url[0]);
@@ -260,15 +264,4 @@ extern "C"
         return true;
     }
 
-    // Invoked when DATA Stage of VENDOR's request is complete
-    bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request)
-    {
-        if(_webUSB == NULL) return false;
-        (void)rhport;
-        (void)request;
-        log_v("vendor DATA stage completed");
-
-        // nothing to do
-        return true;
-    }
 }
