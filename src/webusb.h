@@ -81,9 +81,7 @@ public:
 
 private:
 
-  friend bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request);
-  friend bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request);
-  friend void tud_vendor_rx_cb(uint8_t itf);
+  friend bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request);
 
   uint8_t* _url;
   uint8_t _EPNUM_VENDOR;

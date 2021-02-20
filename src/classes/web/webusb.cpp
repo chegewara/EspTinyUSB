@@ -127,7 +127,7 @@ void WebUSB::setCallbacks(WebUSBCallbacks* cb)
 
 void tud_vendor_rx_cb(uint8_t itf)
 {
-    if(_webUSB->_itf == itf && _webUSB->m_callbacks)
+    if(itf && _webUSB->m_callbacks)
         _webUSB->m_callbacks->onData();
 }
 

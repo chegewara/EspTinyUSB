@@ -19,7 +19,7 @@ public:
     CDCusb(uint8_t itf = 0);
     bool begin(char* str = nullptr);
     int available(void);
-    int peek(int pos = 0);
+    int peek(void);
     int read(void);
     size_t read(uint8_t *buffer, size_t size);
     void flush(void);
