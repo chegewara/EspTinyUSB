@@ -80,6 +80,7 @@ public:
   WebUSBCallbacks* m_callbacks;
 
 private:
+
   friend bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const *request);
   friend bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const *request);
   friend void tud_vendor_rx_cb(uint8_t itf);
