@@ -5,13 +5,16 @@
 #include "hidusb.h"
 #define EPNUM_HID   0x03
 
-static HIDusb *_hidUSB = NULL;
-
-HIDusb::HIDusb()
+static HIDusb *_hidUSB;
+static uint8_t num;
+uint8_t HIDusb::hid_report_desc[500];
+static bool firstHID = true;
+static size_t pos = 9;
+HIDusb::HIDusb(uint8_t reportid)
 {
-    enableHID = true;
-    _hidUSB = this;
-    _EPNUM_HID = EPNUM_HID;
+  enableHID = true;
+  _EPNUM_HID = EPNUM_HID;
+  _hidUSB = this;
 }
 
 void HIDusb::setBaseEP(uint8_t ep)
@@ -19,9 +22,9 @@ void HIDusb::setBaseEP(uint8_t ep)
   _EPNUM_HID = ep;
 }
 
-void HIDusb::onData(hid_on_data_t cb)
+void HIDusb::setCallbacks(HIDCallbacks* cb)
 {
-    _data_cb = cb;
+  m_callbacks = cb;
 }
 
 size_t HIDusb::write(uint8_t _r) {
@@ -39,11 +42,19 @@ size_t HIDusb::write(const uint8_t *buffer, size_t len) {
   return len;
 }
 
+size_t HIDusb::write(char c) {
+  return write((uint8_t) c);
+}
+
+size_t HIDusb::write(const char *buffer, size_t len) {
+  return write((const uint8_t*) buffer, len);
+}
+
 // Invoked when received GET HID REPORT DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 uint8_t const * tud_hid_descriptor_report_cb(void)
 {
-    return _hidUSB->hid_report_desc;
+    return HIDusb::hid_report_desc;
 }
 
 // Invoked when received GET_REPORT control request
@@ -66,11 +77,9 @@ uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type,
 void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
   // This example doesn't use multiple report and report ID
-  (void) report_id;
-  (void) report_type;
-    log_d("tud_hid_set_report_cb: %d", report_id);
+  log_d("tud_hid_set_report_cb: %d", report_id);
 
-  if(_hidUSB->_data_cb) {
-    _hidUSB->_data_cb(report_id, (uint8_t)report_type, buffer, bufsize);
+  if(_hidUSB->m_callbacks) {
+    _hidUSB->m_callbacks->onData(report_id, report_type, buffer, bufsize);
   }
 }

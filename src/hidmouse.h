@@ -11,7 +11,7 @@
 class HIDmouse : public HIDusb
 {
 public:
-    HIDmouse();
+    HIDmouse(uint8_t id = 2);
     bool begin(char* str = nullptr);
 
     void buttons(uint8_t buttons);

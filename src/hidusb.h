@@ -3,11 +3,19 @@
 
 #pragma once
 
+class HIDCallbacks
+{
+public:
+    virtual ~HIDCallbacks() { }
+    virtual void onData(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) { }
+};
+
 class HIDusb : public EspTinyUSB
 {
 public:
-    HIDusb();
+    HIDusb(uint8_t reportid = 0);
     virtual bool begin(char* str = nullptr) = 0;
+    void begin(uint8_t* desc_hid_report, size_t len1, uint8_t* hid, size_t len2);
     int available(void) { return -1; }
     int peek(void) { return -1; }
     int read(void) { return -1; }
@@ -15,13 +23,15 @@ public:
     void flush(void) { return; }
     size_t write(uint8_t);
     size_t write(const uint8_t *buffer, size_t size);
+    size_t write(char);
+    size_t write(const char *buffer, size_t size);
     void setBaseEP(uint8_t);
 
-    void onData(hid_on_data_t cb);
+    void setCallbacks(HIDCallbacks* cb);
 
     uint8_t _EPNUM_HID;
     uint8_t report_id;
-    hid_on_data_t _data_cb;
-    uint8_t hid_report_desc[500];
-    size_t hid_report_desc_len;
+    static uint8_t hid_report_desc[500];
+    static size_t hid_report_desc_len;
+    HIDCallbacks* m_callbacks;
 };

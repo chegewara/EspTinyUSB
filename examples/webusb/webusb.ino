@@ -7,20 +7,21 @@
 #include "webusb.h"
 WebUSB USBSerial;
 
-void conCB(bool isCon)
-{
-    Serial.printf("connection state changed, new state %s\n", isCon? "connected" : "disconnected");
-}
-
+class MyWebUSBCallbacks : public WebUSBCallbacks{
+    void onConnect(bool state) {
+      Serial.printf("webusb is %s\n", state ? "connected":"disconnected");
+    }
+};
 
 void setup() {
     Serial.begin(115200);
     USBSerial.deviceID(0xcafe, 0x0002);
 
+    USBSerial.setCallbacks(new MyWebUSBCallbacks());
+
     if(!USBSerial.begin())
         Serial.println("Failed to start webUSB stack");
 
-    USBSerial.onConnect(conCB); // optional
 }
 
 void echo_all(char c)

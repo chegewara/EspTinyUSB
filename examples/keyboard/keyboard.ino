@@ -2,11 +2,20 @@
  * Simple HID keyboard
  * author: chegewara
  */
-
 #include "Arduino.h"
 #include "hidkeyboard.h"
 
 HIDkeyboard dev;
+
+class MyHIDCallbacks: public HIDCallbacks{
+  void onData(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize) {
+    Serial.printf("ID: %d, type: %d, size: %d\n", report_id, (int)report_type, bufsize);  
+     for (size_t i = 0; i < bufsize; i++)
+    {
+        Serial.printf("%d\n", buffer[i]);
+    }   
+  }
+};
 
 void dataCB(uint8_t report_id, uint8_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
@@ -22,7 +31,7 @@ void setup()
 {
     Serial.begin(115200);
     dev.begin();
-    dev.onData(dataCB);
+    dev.setCallbacks(new MyHIDCallbacks());
 }
 
 void loop()

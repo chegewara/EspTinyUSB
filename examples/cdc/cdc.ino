@@ -1,41 +1,62 @@
 /**
  * Simple CDC device connect with putty to use it
  * author: chegewara
+ * Serial - used only for logging
+ * Serial1 - can be used to control GPS or any other device, may be replaced with Serial
  */
 #include "Arduino.h"
 #include "cdcusb.h"
 
 CDCusb USBSerial;
 
-void conCB(bool isCon)
-{
-    Serial.printf("connection state changed, new state %s\n", isCon ? "connected" : "disconnected");
-}
+class MyUSBCallbacks : public CDCCallbacks {
+    void onCodingChange(cdc_line_coding_t const* p_line_coding)
+    {
+        int bitrate = USBSerial.getBitrate();
+        Serial.printf("new bitrate: %d\n", bitrate);
+        Serial1.updateBaudRate(bitrate);
+    }
+
+    void onConnect(bool dtr, bool rts)
+    {
+        Serial.printf("connection state changed, dtr: %d, rts: %d\n", dtr, rts);
+    }
+
+    void onData()
+    {
+        int len = USBSerial.available();
+        Serial.printf("\nnew data, len %d\n", len);
+        uint8_t buf[len] = {};
+        USBSerial.read(buf, len);
+        Serial1.write(buf, len);
+    }
+
+    void onWantedChar(char c)
+    {
+        Serial.printf("wanted char: %c\n", c);
+    }
+};
+
 
 void setup()
 {
     Serial.begin(115200);
+    Serial1.begin(115200, SERIAL_8N1, 2, 3);
+    USBSerial.setCallbacks(new MyUSBCallbacks());
+    USBSerial.setWantedChar('x');
 
     if (!USBSerial.begin())
         Serial.println("Failed to start CDC USB stack");
 
-    USBSerial.onConnect(conCB);
-}
-
-void echo_all(char c)
-{
-    USBSerial.write(c);
-    Serial.write(c);
 }
 
 void loop()
 {
-    while (USBSerial.available())
+    while (Serial1.available())
     {
-        echo_all(USBSerial.read());
-    }
-    while (Serial.available())
-    {
-        echo_all(Serial.read());
+        int len = Serial1.available();
+        char buf1[len];
+        Serial1.read(buf1, len);
+        int a = USBSerial.write((uint8_t*)buf1, len);
     }
 }
