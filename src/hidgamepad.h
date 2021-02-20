@@ -5,7 +5,7 @@
 class HIDgamepad : public HIDusb
 {
 public:
-    HIDgamepad();
+    HIDgamepad(uint8_t id = 4);
     bool begin(char* str = nullptr);
 
     void buttons(uint16_t);

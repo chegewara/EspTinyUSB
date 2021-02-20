@@ -38,11 +38,7 @@ descriptor_strings_t EspTinyUSB::strings;
 uint16_t EspTinyUSB::_revision;
 uint16_t EspTinyUSB::_bcdUSB;
 size_t EspTinyUSB::hid_report_desc_len = 0;
-
-static esp_tud_mount_cb _mount_cb = nullptr;
-static esp_tud_umount_cb _umount_cb = nullptr;
-static esp_tud_suspend_cb _suspend_cb = nullptr;
-static esp_tud_resume_cb _resume_cb = nullptr;
+USBCallbacks* EspTinyUSB::m_callbacks;
 
 static void esptinyusbtask(void *p)
 {
@@ -187,28 +183,9 @@ bool EspTinyUSB::begin(char* str, uint8_t n)
     return xTaskCreate(esptinyusbtask, "espUSB", 4 * 1024, NULL, 24, &usbTaskHandle) == pdTRUE;
 }
 
-void EspTinyUSB::registerDeviceCallbacks(esp_tud_mount_cb mount_cb, esp_tud_umount_cb umount_cb,
-                                        esp_tud_suspend_cb suspend_cb, esp_tud_resume_cb resume_cb)
+void EspTinyUSB::registerDeviceCallbacks(USBCallbacks* cb)
 {
-    if (mount_cb)
-    {
-        _mount_cb = mount_cb;
-    }
-    
-    if (umount_cb)
-    {
-        _umount_cb = umount_cb;
-    }
-    
-    if (suspend_cb)
-    {
-        _suspend_cb = suspend_cb;
-    }
-    
-    if (resume_cb)
-    {
-        _resume_cb = resume_cb;
-    }
+    m_callbacks = cb;
 }
 
 
@@ -241,18 +218,18 @@ void EspTinyUSB::useMSC(bool en)
 // Invoked when device is mounted
 void tud_mount_cb(void)
 {
-    if (_mount_cb != nullptr)
+    if (EspTinyUSB::m_callbacks)
     {
-        _mount_cb();
+        EspTinyUSB::m_callbacks->onMount();
     }
 }
 
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
-    if (_umount_cb != nullptr)
+    if (EspTinyUSB::m_callbacks)
     {
-        _umount_cb();
+        EspTinyUSB::m_callbacks->onUnmount();
     }
 }
 
@@ -261,19 +238,17 @@ void tud_umount_cb(void)
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 void tud_suspend_cb(bool remote_wakeup_en)
 {
-    ESP_LOGI(TAG, "%s", __func__);
-    if (_suspend_cb != nullptr)
+    if (EspTinyUSB::m_callbacks)
     {
-        _suspend_cb(remote_wakeup_en);
+        EspTinyUSB::m_callbacks->onSuspend(remote_wakeup_en);
     }
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
-    ESP_LOGI(TAG, "%s", __func__);
-    if (_resume_cb != nullptr)
+    if (EspTinyUSB::m_callbacks)
     {
-        _resume_cb();
+        EspTinyUSB::m_callbacks->onResume();
     }
 }

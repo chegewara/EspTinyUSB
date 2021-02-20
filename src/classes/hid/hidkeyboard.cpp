@@ -3,18 +3,17 @@
 
 #include "hidkeyboard.h"
 #define EPNUM_HID 0x02
-#define REPORT_ID 3
 
-HIDkeyboard::HIDkeyboard()
+HIDkeyboard::HIDkeyboard(uint8_t reportid)
 {
+  report_id = reportid;
   enableHID = true;
   _EPNUM_HID = EPNUM_HID;
 }
 
-static uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(REPORT_ID))};
-
 bool HIDkeyboard::begin(char *str)
 {
+  uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(report_id))};
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
   uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 1)};
   memcpy(&desc_configuration[total], hid, sizeof(hid));
@@ -25,7 +24,6 @@ bool HIDkeyboard::begin(char *str)
   EspTinyUSB::hid_report_desc_len += TUD_HID_DESC_LEN;
   log_d("begin len: %d", EspTinyUSB::hid_report_desc_len);
 
-  report_id = REPORT_ID;
   return EspTinyUSB::begin(str, 6);
 }
 
@@ -52,13 +50,13 @@ bool HIDkeyboard::sendPress(uint8_t _keycode, uint8_t modifier)
   uint8_t keycode[6] = {0};
   keycode[0] = _keycode;
 
-  return tud_hid_keyboard_report(REPORT_ID, modifier, keycode);
+  return tud_hid_keyboard_report(report_id, modifier, keycode);
 }
 
 bool HIDkeyboard::sendRelease()
 {
   // send empty key report if previously has key pressed
-  return tud_hid_keyboard_report(REPORT_ID, 0, NULL);
+  return tud_hid_keyboard_report(report_id, 0, NULL);
 }
 
 bool HIDkeyboard::sendString(const char* _text)

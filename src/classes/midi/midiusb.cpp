@@ -19,7 +19,7 @@ void MIDIusb::setBaseEP(uint8_t ep)
 bool MIDIusb::begin(char* str)
 {
     // Interface number, string index, EP Out & EP In address, EP size
-    uint8_t midi[] = {TUD_MIDI_DESCRIPTOR(1, 8, _EPNUM_MIDI, 0x80 | _EPNUM_MIDI, 64)};
+    uint8_t midi[] = {TUD_MIDI_DESCRIPTOR(1, 8, _EPNUM_MIDI, (uint8_t)(0x80 | _EPNUM_MIDI), 64)};
     memcpy(&desc_configuration[total], midi, sizeof(midi));
     total += sizeof(midi);
     count += 2;

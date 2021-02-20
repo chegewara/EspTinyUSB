@@ -1,57 +1,13 @@
 #include "Arduino.h"
-// #include "vendor_device.h"
 #include "esptinyusb.h"
 #include "webusb.h"
 
 static bool web_serial_connected = false;
 static WebUSB *_webUSB = NULL;
-#define MS_OS_20_DESC_LEN 0xB2
-#define EPNUM_VENDOR 0x03
-#define _vendor  "Vendor class (webUSB)"
-
-// https://developers.google.com/web/fundamentals/native-hardware/build-for-webusb#microsoft_os_compatibility_descriptors
-uint8_t desc_ms_os_20[] = {
-    // Set header: length, type, windows version, total length
-    U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR),
-    U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
-
-    // Configuration subset header: length, type, configuration index, reserved,
-    // configuration total length
-    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_CONFIGURATION),
-    0, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN - 0x0A),
-
-    // Function Subset header: length, type, first interface, reserved, subset
-    // length
-    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION),
-    0 /*itf num*/, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN - 0x0A - 0x08),
-
-    // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub
-    // compatible ID
-    U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W',
-    'I', 'N', 'U', 'S', 'B', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, // sub-compatible
-
-    // MS OS 2.0 Registry property descriptor: length, type
-    U16_TO_U8S_LE(MS_OS_20_DESC_LEN - 0x0A - 0x08 - 0x08 - 0x14),
-    U16_TO_U8S_LE(MS_OS_20_FEATURE_REG_PROPERTY), U16_TO_U8S_LE(0x0007),
-    U16_TO_U8S_LE(0x002A), // wPropertyDataType, wPropertyNameLength and
-                           // PropertyName "DeviceInterfaceGUIDs\0" in UTF-16
-    'D', 0x00, 'e', 0x00, 'v', 0x00, 'i', 0x00, 'c', 0x00, 'e', 0x00, 'I', 0x00,
-    'n', 0x00, 't', 0x00, 'e', 0x00, 'r', 0x00, 'f', 0x00, 'a', 0x00, 'c', 0x00,
-    'e', 0x00, 'G', 0x00, 'U', 0x00, 'I', 0x00, 'D', 0x00, 's', 0x00, 0x00,
-    0x00,
-    U16_TO_U8S_LE(0x0050), // wPropertyDataLength
-    // bPropertyData: “{975F44D9-0D08-43FD-8B3E-127CA8AFFF9D}”.
-    '{', 0x00, '9', 0x00, '7', 0x00, '5', 0x00, 'F', 0x00, '4', 0x00, '4', 0x00,
-    'D', 0x00, '9', 0x00, '-', 0x00, '0', 0x00, 'D', 0x00, '0', 0x00, '8', 0x00,
-    '-', 0x00, '4', 0x00, '3', 0x00, 'F', 0x00, 'D', 0x00, '-', 0x00, '8', 0x00,
-    'B', 0x00, '3', 0x00, 'E', 0x00, '-', 0x00, '1', 0x00, '2', 0x00, '7', 0x00,
-    'C', 0x00, 'A', 0x00, '8', 0x00, 'A', 0x00, 'F', 0x00, 'F', 0x00, 'F', 0x00,
-    '9', 0x00, 'D', 0x00, '}', 0x00, 0x00, 0x00, 0x00, 0x00};
 
 WebUSB::WebUSB(uint8_t itf)
 {
-    _itf = itf;
+    _itf = 0;  // hardcoded due to limitations in arduino tinyusb
     _webUSB = this;
     enableVENDOR = true;
     String url = String("www.tinyusb.org/examples/webusb-serial");
@@ -70,7 +26,7 @@ bool WebUSB::begin(char* str, const char *url, bool ssl)
         landingPageURI(url, ssl);
 
     // Interface number, string index, EP Out & IN address, EP size
-    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, _EPNUM_VENDOR, 0x80 | _EPNUM_VENDOR, 64)};
+    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, _EPNUM_VENDOR, (uint8_t)(0x80 | _EPNUM_VENDOR), 64)};
     memcpy(&desc_configuration[total], vendor, sizeof(vendor));
     total += sizeof(vendor);
     count++;
@@ -85,8 +41,6 @@ int WebUSB::available()
 
 int WebUSB::peek()
 {
-    ESP_LOGD(__func__, "");
-
     int pos;
     uint8_t buffer[1];
     if (web_serial_connected)
@@ -102,7 +56,6 @@ int WebUSB::peek()
 
 int WebUSB::read()
 {
-    ESP_LOGD(__func__, "");
     if (web_serial_connected)
     {
         char c;
@@ -118,7 +71,6 @@ int WebUSB::read()
 
 size_t WebUSB::read(uint8_t *buffer, size_t size)
 {
-    ESP_LOGV(__func__, "");
     if (web_serial_connected)
     {
         if (tud_vendor_n_available(_itf))
@@ -133,7 +85,6 @@ size_t WebUSB::read(uint8_t *buffer, size_t size)
 
 size_t WebUSB::write(uint8_t c)
 {
-    ESP_LOGV(__func__, "");
     return write(&c, 1);
 }
 
@@ -148,11 +99,6 @@ void WebUSB::flush() {}
 WebUSB::operator bool() const
 {
     return web_serial_connected;
-}
-
-void WebUSB::onConnect(usb_connected_cb cb)
-{
-    _connected_cb = cb;
 }
 
 void WebUSB::landingPageURI(String url, bool ssl)
@@ -174,18 +120,15 @@ void WebUSB::landingPageURI(const char *url, bool ssl)
     _url[2] = ssl;
 }
 
-void WebUSB::onData(usb_data_cb_t cb)
+void WebUSB::setCallbacks(WebUSBCallbacks* cb)
 {
-    _data_cb = cb;
+    m_callbacks = cb;
 }
 
 void tud_vendor_rx_cb(uint8_t itf)
 {
-    if (_webUSB->_data_cb)
-    {
-    ESP_LOGD(__func__, "");
-        _webUSB->_data_cb();
-    }
+    if(_webUSB->_itf == itf && _webUSB->m_callbacks)
+        _webUSB->m_callbacks->onData();
 }
 
 //--------------------------------------------------------------------+
@@ -248,10 +191,8 @@ extern "C"
             // connect and disconnect.
             web_serial_connected = (request->wValue != 0);
 
-            if (_webUSB->_connected_cb != nullptr)
-            {
-                _webUSB->_connected_cb(web_serial_connected);
-            }
+            if(_webUSB->m_callbacks)
+                _webUSB->m_callbacks->onConnect(web_serial_connected);
 
             // response with status OK
             return tud_control_status(rhport, request);

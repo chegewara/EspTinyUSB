@@ -7,14 +7,6 @@
 // Device callbacks
 //--------------------------------------------------------------------+
 
-typedef void (*esp_tud_mount_cb)(void);
-typedef void (*esp_tud_umount_cb)(void);
-typedef void (*esp_tud_suspend_cb)(bool remote_wakeup_en);
-typedef void (*esp_tud_resume_cb)(void);
-typedef void (*usb_connected_cb)(bool);
-typedef void (*usb_data_cb_t)(void);
-typedef void (*hid_on_data_t)(uint8_t report_id, uint8_t report_type, uint8_t const* buffer, uint16_t bufsize);
-
 typedef struct 
 {
     char langId[2];
@@ -32,13 +24,21 @@ typedef struct
 
 static const char *descriptor_str_config[11];
 
+class USBCallbacks { 
+public:
+    virtual ~USBCallbacks() { }
+    virtual void onMount() { }
+    virtual void onUnmount() { }
+    virtual void onSuspend(bool remote_wakeup_en) { }
+    virtual void onResume() { }
+};
+
 class EspTinyUSB : Stream
 {
 public:
     EspTinyUSB(bool extPhy = false);
     bool begin(char* str, uint8_t n);
-    static void registerDeviceCallbacks(esp_tud_mount_cb _mount_cb = nullptr, esp_tud_umount_cb _umount_cb = nullptr,
-                                        esp_tud_suspend_cb _suspend_cb = nullptr, esp_tud_resume_cb _resume_cb = nullptr);
+    static void registerDeviceCallbacks(USBCallbacks* cb);
 
     static size_t hid_report_desc_len;
 
@@ -71,11 +71,16 @@ public:
     friend tusb_desc_device_t *tusb_get_active_desc(void);
     friend char **tusb_get_active_str_desc(void);
     friend void tusb_clear_descriptor(void);
+    friend void tud_mount_cb(void);
+    friend void tud_umount_cb(void);
+    friend void tud_suspend_cb(bool remote_wakeup_en);
+    friend void tud_resume_cb(void);
 
 protected:
     static uint8_t *descriptor_config;
     static uint8_t *descriptor_config_if;
     uint8_t _itf;
+    static USBCallbacks* m_callbacks;
 
     xTaskHandle usbTaskHandle;
 
