@@ -2,8 +2,6 @@
 
 #pragma once
 
-TU_ATTR_WEAK void coding_line_cb();
-
 class CDCCallbacks : public USBCallbacks {
 public:
     virtual ~CDCCallbacks() { }
