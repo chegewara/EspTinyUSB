@@ -4,9 +4,12 @@
 
 #include "dfuusb.h"
 
+DFUusb* _DFU = NULL;
+
 DFUusb::DFUusb()
 {
     enableDFU = true;
+    _DFU = this;
 }
 
 bool DFUusb::begin(char* str)
@@ -25,6 +28,5 @@ bool DFUusb::begin(char* str)
  */
 void tud_dfu_rt_reboot_to_dfu(void)
 {
-    REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-    SET_PERI_REG_MASK(RTC_CNTL_OPTIONS0_REG, RTC_CNTL_SW_PROCPU_RST);
+    _DFU->persistentReset(RESTART_BOOTLOADER_DFU);
 }
