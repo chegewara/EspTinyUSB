@@ -17,9 +17,10 @@ class MyUSBCallbacks : public CDCCallbacks {
         Serial1.updateBaudRate(bitrate);
     }
 
-    void onConnect(bool dtr, bool rts)
+    bool onConnect(bool dtr, bool rts)
     {
         Serial.printf("connection state changed, dtr: %d, rts: %d\n", dtr, rts);
+        return true;  // allow to persist reset, when Arduino IDE is trying to enter bootloader mode
     }
 
     void onData()

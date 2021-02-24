@@ -3,9 +3,37 @@
 #include "usb_descriptors.h"
 
 #pragma once
+#include "soc/rtc_cntl_reg.h"
+#include "soc/usb_struct.h"
+#include "soc/usb_reg.h"
+#include "soc/usb_wrap_reg.h"
+#include "soc/usb_wrap_struct.h"
+
+#include "esp32s2/rom/usb/usb_persist.h"
+#include "esp32s2/rom/usb/usb_dc.h"
+#include "esp32s2/rom/usb/chip_usb_dw_wrapper.h"
+/*
+ * USB Persistence API
+ * */
+typedef enum {
+    RESTART_NO_PERSIST,
+    RESTART_PERSIST,
+    RESTART_BOOTLOADER,
+    RESTART_BOOTLOADER_DFU,
+    RESTART_TYPE_MAX
+} restart_type_t;
+
 //--------------------------------------------------------------------+
 // Device callbacks
 //--------------------------------------------------------------------+
+class USBCallbacks { 
+public:
+    virtual ~USBCallbacks() { }
+    virtual void onMount() { }
+    virtual void onUnmount() { }
+    virtual void onSuspend(bool remote_wakeup_en) { }
+    virtual void onResume() { }
+};
 
 typedef struct 
 {
@@ -24,14 +52,6 @@ typedef struct
 
 static const char *descriptor_str_config[11];
 
-class USBCallbacks { 
-public:
-    virtual ~USBCallbacks() { }
-    virtual void onMount() { }
-    virtual void onUnmount() { }
-    virtual void onSuspend(bool remote_wakeup_en) { }
-    virtual void onResume() { }
-};
 
 class EspTinyUSB : Stream
 {
@@ -39,6 +59,7 @@ public:
     EspTinyUSB(bool extPhy = false);
     bool begin(char* str, uint8_t n);
     static void registerDeviceCallbacks(USBCallbacks* cb);
+    void persistentReset(restart_type_t usb_persist_mode);
 
     static size_t hid_report_desc_len;
 

@@ -5,6 +5,7 @@
 #define EPNUM_CDC   0x02
 
 static CDCusb* _CDCusb[2] = {};
+enum { CDC_LINE_IDLE, CDC_LINE_1, CDC_LINE_2, CDC_LINE_3 };
 
 CDCusb::CDCusb(uint8_t itf)
 {
@@ -170,8 +171,40 @@ void tud_cdc_rx_wanted_cb(uint8_t itf, char wanted_char) {
 // Invoked when line state DTR & RTS are changed via SET_CONTROL_LINE_STATE
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
 {
+    static uint8_t lineState = CDC_LINE_IDLE;
+    bool reset = true;
+
     if(_CDCusb[itf]->m_callbacks)
-        _CDCusb[itf]->m_callbacks->onConnect(dtr, rts);
+        reset = _CDCusb[itf]->m_callbacks->onConnect(dtr, rts);
+
+    if(!dtr && rts){
+        if(lineState == CDC_LINE_IDLE){
+            lineState++;
+        } else {
+            lineState = CDC_LINE_IDLE;
+        }
+    } else if(dtr && rts){
+        if(lineState == CDC_LINE_1){
+            lineState++;
+        } else {
+            lineState = CDC_LINE_IDLE;
+        }
+    } else if(dtr && !rts){
+        if(lineState == CDC_LINE_2){
+            lineState++;
+        } else {
+            lineState = CDC_LINE_IDLE;
+        }
+    } else if(!dtr && !rts){
+        if(lineState == CDC_LINE_3){
+            if (reset)
+            {
+                _CDCusb[itf]->persistentReset(RESTART_BOOTLOADER);
+            }
+        } else {
+            lineState = CDC_LINE_IDLE;
+        }
+    }
 }
 
 void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding)

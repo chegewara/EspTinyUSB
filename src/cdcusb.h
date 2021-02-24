@@ -5,7 +5,7 @@
 class CDCCallbacks : public USBCallbacks {
 public:
     virtual ~CDCCallbacks() { }
-    virtual void onConnect(bool dtr, bool rts) { }
+    virtual bool onConnect(bool dtr, bool rts) { return true; }
     virtual void onData() { }
     virtual void onCodingChange(cdc_line_coding_t const* p_line_coding) { }
     virtual void onWantedChar(char c) { }
