@@ -53,7 +53,7 @@ typedef struct
 static const char *descriptor_str_config[11];
 
 
-class EspTinyUSB : Stream
+class EspTinyUSB : public Stream
 {
 public:
     EspTinyUSB(bool extPhy = false);
@@ -76,13 +76,6 @@ public:
     static void revision(uint16_t);
     virtual void setBaseEP(uint8_t) = 0;
 
-    virtual int available(void) = 0;
-    virtual int peek(void) = 0;
-    virtual int read(void) = 0;
-    virtual size_t read(uint8_t *buffer, size_t size) = 0;
-    virtual void flush(void) = 0;
-    virtual size_t write(uint8_t) = 0;
-    virtual size_t write(const uint8_t *buffer, size_t size) = 0;
 
     friend uint8_t const *tud_descriptor_device_cb(void);
     friend uint8_t const *tud_descriptor_configuration_cb(uint8_t index);
