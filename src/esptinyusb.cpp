@@ -39,6 +39,8 @@ uint16_t EspTinyUSB::_revision;
 uint16_t EspTinyUSB::_bcdUSB;
 size_t EspTinyUSB::hid_report_desc_len = 0;
 USBCallbacks* EspTinyUSB::m_callbacks;
+static bool usb_persist_enabled = true;
+static restart_type_t usb_persist_mode = RESTART_NO_PERSIST;
 
 static void esptinyusbtask(void *p)
 {
@@ -48,6 +50,29 @@ static void esptinyusbtask(void *p)
     {
         // tinyusb device task
         tud_task();
+    }
+}
+
+static void IRAM_ATTR usb_persist_shutdown_handler(void)
+{
+    if(usb_persist_mode != RESTART_NO_PERSIST){
+        if (usb_persist_enabled) {
+            usb_dc_prepare_persist();
+        }
+        if (usb_persist_mode == RESTART_BOOTLOADER) {
+            //USB CDC Download
+            if (usb_persist_enabled) {
+                chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+            }
+            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
+            //DFU Download
+            chip_usb_set_persist_flags(USBDC_BOOT_DFU);
+            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        } else if (usb_persist_enabled) {
+            //USB Persist reboot
+            chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+        }
     }
 }
 
@@ -62,10 +87,12 @@ EspTinyUSB::EspTinyUSB(bool extPhy)
             // Enable USB/IO_MUX peripheral reset, if coming from persistent reboot
             REG_CLR_BIT(RTC_CNTL_USB_CONF_REG, RTC_CNTL_IO_MUX_RESET_DISABLE);
             REG_CLR_BIT(RTC_CNTL_USB_CONF_REG, RTC_CNTL_USB_RESET_DISABLE);
+        } else {
+            periph_module_reset((periph_module_t)PERIPH_USB_MODULE);
+            periph_module_enable((periph_module_t)PERIPH_USB_MODULE);
         }
 
-        periph_module_reset((periph_module_t)PERIPH_USB_MODULE);
-        periph_module_enable((periph_module_t)PERIPH_USB_MODULE);
+        esp_register_shutdown_handler(usb_persist_shutdown_handler);
 
         // Hal init
         usb_hal_context_t hal = {
@@ -220,21 +247,11 @@ void EspTinyUSB::useMSC(bool en)
     enableMSC = en;
 }
 
-void EspTinyUSB::persistentReset(restart_type_t usb_persist_mode)
+void EspTinyUSB::persistentReset(restart_type_t mode)
 {
-    if(usb_persist_mode != RESTART_NO_PERSIST){
-        if (usb_persist_mode == RESTART_BOOTLOADER) {
-            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-            esp_restart();
-        } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
-            //DFU Download
-            chip_usb_set_persist_flags(USBDC_BOOT_DFU);
-            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-            esp_restart();
-        } else {
-            //USB Persist reboot
-            chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
-        }
+    if (mode < RESTART_TYPE_MAX) {
+        usb_persist_mode = mode;
+        esp_restart();
     }
 }
 

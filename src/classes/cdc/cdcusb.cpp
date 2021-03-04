@@ -20,12 +20,20 @@ void CDCusb::setBaseEP(uint8_t ep)
   _EPNUM_CDC = ep;
 }
 
-bool CDCusb::begin(char* str)
+bool CDCusb::begin(char* str, bool full_persist)
 {
     // Interface number, string index, EP notification address and size, EP data address (out, in) and size.
-    uint8_t cdc[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, (uint8_t)(0x80 | (_EPNUM_CDC - 1)), 8, (uint8_t)_EPNUM_CDC, (uint8_t)(0x80 | _EPNUM_CDC), 64)};
-    memcpy(&desc_configuration[total], cdc, sizeof(cdc));
-    total += sizeof(cdc);
+    uint8_t _cdc1[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, (uint8_t)(0x80 | (_EPNUM_CDC - 1)), 8, (uint8_t)_EPNUM_CDC, (uint8_t)(0x80 | _EPNUM_CDC), 64)};
+    uint8_t _cdc2[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, (uint8_t)(0x85), 64, (uint8_t)0x03, (uint8_t)(0x84), 64)};
+
+    uint8_t* cdc = nullptr;
+    if(full_persist)
+        cdc = _cdc2;
+    else
+        cdc = _cdc1;
+
+    memcpy(&desc_configuration[total], cdc, TUD_CDC_DESC_LEN);
+    total += TUD_CDC_DESC_LEN;
     ifIdx += 2;
     count += 2;
 

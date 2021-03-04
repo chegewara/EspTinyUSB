@@ -15,7 +15,7 @@ class CDCusb : public EspTinyUSB
 {
 public:
     CDCusb(uint8_t itf = 0);
-    bool begin(char* str = nullptr);
+    bool begin(char* str = nullptr, bool full_persist = false);
     int available(void);
     int peek(void);
     int read(void);
