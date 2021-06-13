@@ -1,0 +1,16 @@
+[env:esp32s2doit-devkit-v1]
+platform = espressif32
+platform_packages = 
+  framework-arduinoespressif32 @ https://github.com/espressif/arduino-esp32#master
+  platformio/tool-esptoolpy @ ~1.30100
+board = esp32-devkitlipo
+framework = arduino
+lib_deps = 
+  https://github.com/chegewara/EspTinyUSB
+board_build.mcu = esp32s2
+build_flags = 
+  -Wl,--wrap,tud_descriptor_configuration_cb
+  -Wl,--wrap,tud_descriptor_device_cb
+  -Wl,--wrap,tud_descriptor_string_cb
+monitor_filters = esp32_exception_decoder
+

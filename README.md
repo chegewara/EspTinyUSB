@@ -31,5 +31,10 @@ device.deviceID(uint16_t VID, uint16_t PID);
 device.deviceID(uint16_t* VID, uint16_t* PID);
 ```
 
+# Additional configuration necessary
+
+For arduino, create `platform.local.txt` in `.../Users/XXXX/Documents/Arduino/hardware/espressif/esp32/` with contents found in the `platform.local.txt.example`.
+For platformio, make sure to add the build flags found in `platformio.ini.example`.
+
 # Contributions
 Issues and PRs are welcome.

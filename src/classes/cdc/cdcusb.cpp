@@ -43,7 +43,7 @@ int CDCusb::peek()
     if (tud_cdc_n_connected(_itf))
     {
         uint8_t buffer;
-        tud_cdc_n_peek(_itf, 0, &buffer);
+        tud_cdc_n_peek(_itf, &buffer);
         return buffer;
     }
     else

@@ -1,0 +1,1 @@
+compiler.c.elf.flags=-Wl,--wrap=tud_descriptor_configuration_cb -Wl,--wrap=tud_descriptor_device_cb, -Wl,--wrap=tud_descriptor_string_cb

@@ -12,6 +12,7 @@
 #include "esp32s2/rom/usb/usb_persist.h"
 #include "esp32s2/rom/usb/usb_dc.h"
 #include "esp32s2/rom/usb/chip_usb_dw_wrapper.h"
+
 /*
  * USB Persistence API
  * */
@@ -89,10 +90,10 @@ public:
     friend void tud_umount_cb(void);
     friend void tud_suspend_cb(bool remote_wakeup_en);
     friend void tud_resume_cb(void);
-
-protected:
     static uint8_t *descriptor_config;
     static uint8_t *descriptor_config_if;
+
+protected:
     uint8_t _itf;
     static USBCallbacks* m_callbacks;
 
