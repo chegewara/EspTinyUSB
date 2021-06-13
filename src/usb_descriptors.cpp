@@ -107,6 +107,8 @@ tusb_desc_device_t EspTinyUSB::getDeviceDescriptor()
     return _descriptor_config;
 }
 
+
+extern "C" {
 // =============================================================================
 // Driver functions
 // =============================================================================
@@ -116,7 +118,7 @@ tusb_desc_device_t EspTinyUSB::getDeviceDescriptor()
  *
  * @return uint8_t const*
  */
-uint8_t const *tud_descriptor_device_cb(void)
+uint8_t const *__wrap_tud_descriptor_device_cb(void)
 {
     return (uint8_t const*)EspTinyUSB::descriptor_config;
 }
@@ -128,7 +130,7 @@ uint8_t const *tud_descriptor_device_cb(void)
  * @param index
  * @return uint8_t const* Application return pointer to descriptor
  */
-uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
+uint8_t const *__wrap_tud_descriptor_configuration_cb(uint8_t index)
 {
     (void)index; // for multiple configurations
     return (uint8_t const*)EspTinyUSB::descriptor_config_if;
@@ -144,7 +146,7 @@ static uint16_t _desc_str[32];
  * @param index
  * @return uint16_t const*
  */
-uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+uint16_t const *__wrap_tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
     uint8_t chr_count = 0;
     if (index == 0)
@@ -178,4 +180,4 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
     return _desc_str;
 }
-
+}

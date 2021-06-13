@@ -1,6 +1,8 @@
 #include "Arduino.h"
 #include "tusb.h"
 #include "soc/rtc_cntl_reg.h"
+#include "class/midi/midi.h"
+#include "class/midi/midi_device.h"
 
 #include "midiusb.h"
 #define EPNUM_MIDI 0x06
@@ -29,23 +31,23 @@ bool MIDIusb::begin(char* str)
 void MIDIusb::noteON(uint8_t note, uint8_t velocity, uint8_t channel)
 {
     log_v("ON: %d\n", note);
-    tudi_midi_write24(channel, 0x90, note, velocity);
+    // tudi_midi_write24(channel, 0x90, note, velocity);
 }
 
 void MIDIusb::noteOFF(uint8_t note, uint8_t velocity, uint8_t channel)
 {
     log_v("OFF: %d\n", note);
-    tudi_midi_write24(channel, 0x80, note, velocity);
+    // tudi_midi_write24(channel, 0x80, note, velocity);
 }
 
 void MIDIusb::polyKey(uint8_t note, uint8_t pressure, uint8_t channel)
 {
-    tudi_midi_write24(channel, 0xa0, note, pressure);
+    // tudi_midi_write24(channel, 0xa0, note, pressure);
 }
 
 void MIDIusb::controlChange(uint8_t controller, uint8_t value, uint8_t channel)
 {
-    tudi_midi_write24(channel, 0xb0, controller, value);
+    // tudi_midi_write24(channel, 0xb0, controller, value);
 }
 
 void MIDIusb::programChange(uint8_t program, uint8_t channel)
@@ -198,7 +200,7 @@ void tud_midi_rx_cb(uint8_t itf)
         Serial.printf("%02x ", _mid[i]);      
       }
       Serial.println();   
-      tud_midi_read_flush();
+    //   tud_midi_read_flush();
     } else log_e("failed to receive");
 }
 
