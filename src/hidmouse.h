@@ -7,6 +7,7 @@
 #define MIDDLE_BTN  3
 #define BACK_BTN    4
 #define FORWARD_BTN 5
+#if CFG_TUD_HID
 
 class HIDmouse : public HIDusb
 {
@@ -29,3 +30,5 @@ public:
 
     uint8_t button;
 };
+
+#endif

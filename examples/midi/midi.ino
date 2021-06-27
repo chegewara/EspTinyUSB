@@ -2,9 +2,9 @@
  * Simple example MIDI class
  * author: chegewara
  */
-#include "Arduino.h"
 #include "midiusb.h"
 #include "song.h"
+// #ifdef CFG_TUD_MIDI
 
 MIDIusb midi;
 
@@ -62,3 +62,5 @@ void loop() {
   // midi_task();
   // midi.playSong();
 }
+
+// #endif

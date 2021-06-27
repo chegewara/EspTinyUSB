@@ -3,6 +3,7 @@
 
 #pragma once
 
+#if CFG_TUD_DFU_RUNTIME
 
 class DFUusb : public EspTinyUSB
 {
@@ -18,3 +19,5 @@ public:
     size_t write(const uint8_t *buffer, size_t size) { return 0; }
     void setBaseEP(uint8_t) { return; }
 };
+
+#endif

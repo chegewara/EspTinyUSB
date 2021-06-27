@@ -1,5 +1,6 @@
 #include "sdusb.h"
 
+#ifdef CFG_TUD_MSC
 
 class SDCallbacks : public MSCCallbacks {
     SDCard2USB* m_parent;
@@ -144,3 +145,4 @@ bool SDCard2USB::isReady()
     return sdcardReady;
 }
 
+#endif

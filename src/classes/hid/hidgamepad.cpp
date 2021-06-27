@@ -1,7 +1,6 @@
-#include "tusb.h"
-
 #include "hidgamepad.h"
 #define EPNUM_HID   0x03
+#if CFG_TUD_HID
 
 HIDgamepad::HIDgamepad(uint8_t id)
 {
@@ -14,7 +13,7 @@ bool HIDgamepad::begin(char* str)
 {
     uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GAMEPAD(HID_REPORT_ID(report_id))};
     // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-    uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_NONE, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 10)};
+    uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 10)};
     memcpy(&desc_configuration[total], hid, sizeof(hid));
     total += sizeof(hid);
     count++;
@@ -64,3 +63,4 @@ void HIDgamepad::sendAll(uint16_t bt, int8_t x, int8_t y, int8_t z, int8_t rz)
     sendReport();
 }
 
+#endif

@@ -4,6 +4,8 @@
 #include "SD.h"
 #include "SPI.h"
 
+#if CFG_TUD_MSC
+
 class SDCard2USB : public MSCusb {
     // fs::SDFS &_sd;
 
@@ -23,3 +25,5 @@ public:
     bool sdcardReady;
 
 };
+
+#endif

@@ -3,9 +3,9 @@
  * also CDC class is active, but does nothing
  * author: chegewara
  */
-#include "Arduino.h"
 #include "cdcusb.h"
 #include "dfuusb.h"
+#if CFG_TUD_DFU_RUNTIME
 
 // CDCusb USBSerial;
 DFUusb dev;
@@ -30,3 +30,4 @@ void loop() {
 
 }
 
+#endif

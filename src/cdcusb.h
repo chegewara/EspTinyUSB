@@ -1,6 +1,8 @@
-#include "esptinyusb.h"
-
 #pragma once
+#include "esptinyusb.h"
+#if CFG_TUD_CDC
+
+#include "class/cdc/cdc.h"
 
 class CDCCallbacks : public USBCallbacks {
 public:
@@ -43,3 +45,5 @@ protected:
     cdc_line_coding_t coding;
 
 };
+
+#endif

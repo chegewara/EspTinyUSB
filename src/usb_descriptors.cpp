@@ -14,8 +14,10 @@
 
 #include "esptinyusb.h"
 #include "usb_descriptors.h"
-#include "tusb.h"
 #include "esp_log.h"
+
+#if CONFIG_IDF_TARGET_ESP32S2
+#if CONFIG_TINYUSB_ENABLED
 
 #define USB_TUSB_PID (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) | _PID_MAP(DFU_RT, 5))
 
@@ -179,3 +181,5 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     return _desc_str;
 }
 
+#endif
+#endif

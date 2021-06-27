@@ -2,6 +2,7 @@
 #include "esptinyusb.h"
 
 #pragma once
+#if CFG_TUD_HID
 
 class HIDCallbacks
 {
@@ -35,3 +36,5 @@ public:
     static size_t hid_report_desc_len;
     HIDCallbacks* m_callbacks;
 };
+
+#endif

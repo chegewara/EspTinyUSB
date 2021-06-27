@@ -1,9 +1,6 @@
-#include "Arduino.h"
-#include "tusb.h"
-#include "soc/rtc_cntl_reg.h"
-
 #include "hidusb.h"
 #define EPNUM_HID   0x03
+#if CFG_TUD_HID
 
 static HIDusb *_hidUSB;
 static uint8_t num;
@@ -83,3 +80,5 @@ void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uin
     _hidUSB->m_callbacks->onData(report_id, report_type, buffer, bufsize);
   }
 }
+
+#endif

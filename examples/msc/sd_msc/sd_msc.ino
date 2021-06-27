@@ -2,8 +2,8 @@
  * Simple MSC device with SD card
  * author: chegewara
  */
-#include "Arduino.h"
 #include "sdusb.h"
+#if CFG_TUD_MSC
 
 #define SD_MISO  37
 #define SD_MOSI  39
@@ -30,3 +30,5 @@ void loop()
 {
   delay(1000);
 }
+
+#endif

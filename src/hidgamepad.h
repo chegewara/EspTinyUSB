@@ -1,6 +1,7 @@
 #include "hidusb.h"
 
 #pragma once
+#if CFG_TUD_HID
 
 class HIDgamepad : public HIDusb
 {
@@ -17,3 +18,5 @@ private:
     void sendReport();
     uint8_t report[6];
 };
+
+#endif

@@ -3,6 +3,7 @@
 #include "hidkeylayout.h"
 
 #pragma once
+#if CFG_TUD_HID
 
 class HIDkeyboard : public HIDusb
 {
@@ -17,3 +18,5 @@ public:
     bool sendString(const char* text);
     bool sendString(String text);
 };
+
+#endif

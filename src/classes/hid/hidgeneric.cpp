@@ -1,10 +1,7 @@
-#include "Arduino.h"
-#include "tusb.h"
-#include "soc/rtc_cntl_reg.h"
-
 #include "hidgeneric.h"
 #define EPNUM_HID   0x03
 #define REPORT_ID   1
+#if CFG_TUD_HID
 
 HIDgeneric::HIDgeneric(uint8_t reportid)
 {
@@ -17,7 +14,7 @@ bool HIDgeneric::begin(char* str)
 {
   uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GENERIC_INOUT(CFG_TUD_HID_BUFSIZE, HID_REPORT_ID(report_id))};
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-  uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), _EPNUM_HID, (uint8_t)(0x80 | _EPNUM_HID), CFG_TUD_HID_BUFSIZE, 10)};
+  uint8_t hid[] = {TUD_HID_INOUT_DESCRIPTOR(ifIdx++, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report), _EPNUM_HID, (uint8_t)(0x80 | _EPNUM_HID), CFG_TUD_HID_BUFSIZE, 10)};
   memcpy(&desc_configuration[total], hid, sizeof(hid));
   total += sizeof(hid);
   count++;
@@ -29,3 +26,5 @@ bool HIDgeneric::begin(char* str)
   report_id = REPORT_ID;
   return EspTinyUSB::begin(str, 6);
 }
+
+#endif

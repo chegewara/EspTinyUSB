@@ -1,9 +1,6 @@
-#include "Arduino.h"
-#include "tusb.h"
-#include "soc/rtc_cntl_reg.h"
-
 #include "midiusb.h"
 #define EPNUM_MIDI 0x06
+#if CFG_TUD_MIDI
 
 MIDIusb::MIDIusb()
 {
@@ -206,3 +203,5 @@ int MIDIusb::available()
 {
     return tud_midi_available();
 }
+
+#endif

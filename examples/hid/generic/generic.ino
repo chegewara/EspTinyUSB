@@ -2,7 +2,8 @@
  * Simple vendor In/Out HID device
  * author: chegewara
  */
-#include "Arduino.h"
+#if CFG_TUD_HID
+
 #include "hidgeneric.h"
 
 HIDgeneric dev;
@@ -30,3 +31,5 @@ void loop()
     delay(1000);
     dev.write("test", 4);
 }
+
+#endif

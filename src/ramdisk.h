@@ -1,6 +1,8 @@
 #pragma once
 #include "mscusb.h"
 
+#if CFG_TUD_MSC
+
 #define README_CONTENTS \
 "This is tinyusb's MassStorage Class demo.\r\n\r\n\
 If you find any bugs or get any questions, feel free to file an\r\n\
@@ -97,3 +99,5 @@ public:
     uint8_t WORD_ALIGNED_ATTR *ram_disk = nullptr;
     bool set_demo_content = true;
 };
+
+#endif

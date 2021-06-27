@@ -2,6 +2,8 @@
 #include "esptinyusb.h"
 #include "cdcusb.h"
 
+#if CFG_TUD_CDC
+
 #define EPNUM_CDC   0x02
 
 static CDCusb* _CDCusb[2] = {};
@@ -43,7 +45,7 @@ int CDCusb::peek()
     if (tud_cdc_n_connected(_itf))
     {
         uint8_t buffer;
-        tud_cdc_n_peek(_itf, 0, &buffer);
+        tud_cdc_n_peek(_itf, &buffer);
         return buffer;
     }
     else
@@ -213,3 +215,5 @@ void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding)
     if(_CDCusb[itf]->m_callbacks)
         _CDCusb[itf]->m_callbacks->onCodingChange(p_line_coding);
 }
+
+#endif

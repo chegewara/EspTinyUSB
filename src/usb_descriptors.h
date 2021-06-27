@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include "tusb.h"
-
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
 
 #define USB_ESPRESSIF_VID 0x303A

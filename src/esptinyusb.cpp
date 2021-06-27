@@ -7,7 +7,8 @@
 #include "esp_log.h"
 
 #include "esptinyusb.h"
-#include "tusb.h"
+#if CONFIG_IDF_TARGET_ESP32S2
+#if CONFIG_TINYUSB_ENABLED
 
 #define _manufacturer  "Espressif"
 #define _product  "ESP32S2 arduino device"
@@ -279,3 +280,6 @@ void tud_resume_cb(void)
         EspTinyUSB::m_callbacks->onResume();
     }
 }
+
+#endif
+#endif

@@ -1,5 +1,6 @@
-#include "Arduino.h"
-#include "tusb.h"
+#include "mscusb.h"
+
+#if CFG_TUD_MSC
 
 #include "mscusb.h"
 #define EPNUM_MSC 0x04
@@ -72,18 +73,10 @@ TU_ATTR_WEAK void tud_msc_capacity_cb(uint8_t lun, uint32_t* block_count, uint16
 
 TU_ATTR_WEAK bool tud_msc_start_stop_cb(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
 {
-  (void) lun;
-  (void) power_condition;
-
-  if ( load_eject )
+  for (size_t i = 0; i < 4; i++)
   {
-    if (start)
-    {
-      // load disk storage
-    }else
-    {
-      // unload disk storage
-
+    if(_MSCusb[i] && _MSCusb[i]->m_callbacks && _MSCusb[i]->m_lun == lun) {
+      return _MSCusb[i]->m_callbacks->onStop(lun, power_condition, start, load_eject);
     }
   }
 
@@ -161,3 +154,5 @@ uint8_t tud_msc_get_maxlun_cb(void)
 {
   return luns;
 }
+
+#endif

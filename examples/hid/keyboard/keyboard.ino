@@ -2,6 +2,7 @@
  * Simple HID keyboard
  * author: chegewara
  */
+#if CFG_TUD_HID
 
 #include "hidkeyboard.h"
 #include "Wire.h"
@@ -28,3 +29,5 @@ void loop()
       }
     }
 }
+
+#endif

@@ -23,9 +23,7 @@
  *
  */
 
-// #include "bsp/board.h"
-#include "tusb.h"
-
+#include "mscusb.h"
 #if CFG_TUD_MSC
 
 // Some MCU doesn't have enough 8KB SRAM to store the whole disk

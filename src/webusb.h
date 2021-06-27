@@ -1,9 +1,9 @@
-#include "esptinyusb.h"
-
 #pragma once
+#include "esptinyusb.h"
 #define MS_OS_20_DESC_LEN 0xB2
 #define EPNUM_VENDOR 0x03
 #define _vendor  "Vendor class (webUSB)"
+#if CFG_TUD_VENDOR
 
 // https://developers.google.com/web/fundamentals/native-hardware/build-for-webusb#microsoft_os_compatibility_descriptors
 const uint8_t desc_ms_os_20[] = {
@@ -87,3 +87,5 @@ private:
   uint8_t _EPNUM_VENDOR;
 
 };
+
+#endif

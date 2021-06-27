@@ -3,6 +3,7 @@
 
 #pragma once
 
+#ifdef CFG_TUD_MIDI
 
 class MIDIusb : public EspTinyUSB
 {
@@ -34,3 +35,4 @@ private:
     size_t _len;
     uint8_t _EPNUM_MIDI;
 };
+#endif

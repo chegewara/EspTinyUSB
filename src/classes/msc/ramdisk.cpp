@@ -1,5 +1,6 @@
 #include "ramdisk.h"
 
+#ifdef CFG_TUD_MSC
 
 class RAMCallbacks : public MSCCallbacks {
     USBramdisk* m_parent;
@@ -49,11 +50,21 @@ public:
             if (start)
             {
                 // load disk storage
-                log_v("default start/stop load");
+                log_v("default load");
             }else
             {
                 // unload disk storage
-                log_v("default start/stop unload");
+                log_v("default unload");
+            }
+        } else {
+            if (start)
+            {
+                // load disk storage
+                log_v("default start");
+            }else
+            {
+                // unload disk storage
+                log_v("default stop");
             }
         }
 
@@ -129,3 +140,5 @@ void USBramdisk::setCallbacks(MSCCallbacks* cb)
 {
     m_private = cb;
 }
+
+#endif

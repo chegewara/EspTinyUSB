@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "tusb.h"
 #include "soc/rtc_cntl_reg.h"
 
 #include "dfuusb.h"
+#if CFG_TUD_DFU_RUNTIME
 
 DFUusb* _DFU = NULL;
 
@@ -30,3 +30,5 @@ void tud_dfu_rt_reboot_to_dfu(void)
 {
     _DFU->persistentReset(RESTART_BOOTLOADER_DFU);
 }
+
+#endif

@@ -2,11 +2,11 @@
  * Simple MSC device, use as ram disk
  * author: chegewara
  */
-#include "Arduino.h"
 #include "ramdisk.h"
 //#define AUTO_ALLOCATE_DISK 
 #define BLOCK_COUNT 2 * 100
 #define BLOCK_SIZE 512
+#if CFG_TUD_MSC
 
 USBramdisk dev;
 
@@ -30,3 +30,5 @@ void loop()
 {
   delay(1000);
 }
+
+#endif

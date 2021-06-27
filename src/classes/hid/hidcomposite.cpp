@@ -1,8 +1,6 @@
-#include "Arduino.h"
-#include "tusb.h"
-
 #include "hidcomposite.h"
 #define EPNUM_HID 0x03
+#if CFG_TUD_HID
 
 HIDcomposite::HIDcomposite(uint8_t id)
 {
@@ -19,7 +17,7 @@ bool HIDcomposite::begin(char *str)
         TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID((uint8_t)(report_keyboard)))    
     };
     // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-    uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_PROTOCOL_NONE, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 1)};
+    uint8_t hid[] = {TUD_HID_DESCRIPTOR(ifIdx++, 6, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report), (uint8_t)(_EPNUM_HID | 0x80), CFG_TUD_HID_BUFSIZE, 1)};
     memcpy(&desc_configuration[total], hid, sizeof(hid));
     total += sizeof(hid);
     count++;
@@ -163,3 +161,5 @@ bool HIDcomposite::sendString(String text)
   return sendString(text.c_str());
 }
 /*------------- Keyboard -------------*/
+
+#endif

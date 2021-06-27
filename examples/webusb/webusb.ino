@@ -3,8 +3,8 @@
  * VID = 0xcafe to match filter on website
  * author: chegewara
  */
-#include "Arduino.h"
 #include "webusb.h"
+#if CFG_TUD_VENDOR
 WebUSB USBSerial;
 
 class MyWebUSBCallbacks : public WebUSBCallbacks{
@@ -42,3 +42,4 @@ void loop() {
     }
 }
 
+#endif

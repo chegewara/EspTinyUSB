@@ -1,6 +1,6 @@
-#include "Arduino.h"
-#include "esptinyusb.h"
 #include "webusb.h"
+
+#if CFG_TUD_VENDOR
 
 static bool web_serial_connected = false;
 static WebUSB *_webUSB = NULL;
@@ -45,7 +45,7 @@ int WebUSB::peek()
     uint8_t buffer[1];
     if (web_serial_connected)
     {
-        tud_vendor_n_peek(_itf, 0, buffer);
+        tud_vendor_n_peek(_itf, buffer);
         return buffer[0];
     }
     else
@@ -206,3 +206,6 @@ extern "C"
     }
 
 }
+
+#endif
+

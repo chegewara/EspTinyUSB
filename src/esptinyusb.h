@@ -1,8 +1,13 @@
 
-#include "Arduino.h"
-#include "usb_descriptors.h"
-
 #pragma once
+#include "Arduino.h"
+#if CONFIG_IDF_TARGET_ESP32S2
+#if CONFIG_TINYUSB_ENABLED
+
+#include "tusb_config.h"
+#include "common/tusb_common.h"
+#include "tusb.h"
+
 #include "soc/rtc_cntl_reg.h"
 #include "soc/usb_struct.h"
 #include "soc/usb_reg.h"
@@ -12,6 +17,8 @@
 #include "esp32s2/rom/usb/usb_persist.h"
 #include "esp32s2/rom/usb/usb_dc.h"
 #include "esp32s2/rom/usb/chip_usb_dw_wrapper.h"
+
+#include "usb_descriptors.h"
 /*
  * USB Persistence API
  * */
@@ -118,3 +125,6 @@ protected:
     static uint16_t _revision;
     static uint16_t _bcdUSB;
 };
+
+#endif
+#endif
