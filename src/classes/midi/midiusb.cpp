@@ -26,23 +26,27 @@ bool MIDIusb::begin(char* str)
 void MIDIusb::noteON(uint8_t note, uint8_t velocity, uint8_t channel)
 {
     log_v("ON: %d\n", note);
-    tudi_midi_write24(channel, 0x90, note, velocity);
+    uint8_t buf[] = {channel, 0x90, note, velocity};
+    tud_midi_packet_write(buf);
 }
 
 void MIDIusb::noteOFF(uint8_t note, uint8_t velocity, uint8_t channel)
 {
     log_v("OFF: %d\n", note);
-    tudi_midi_write24(channel, 0x80, note, velocity);
+    uint8_t buf[] = {channel, 0x80, note, velocity};
+    tud_midi_packet_write(buf);
 }
 
 void MIDIusb::polyKey(uint8_t note, uint8_t pressure, uint8_t channel)
 {
-    tudi_midi_write24(channel, 0xa0, note, pressure);
+    uint8_t buf[] = {channel, 0xa0, note, pressure};
+    tud_midi_packet_write(buf);
 }
 
 void MIDIusb::controlChange(uint8_t controller, uint8_t value, uint8_t channel)
 {
-    tudi_midi_write24(channel, 0xb0, controller, value);
+    uint8_t buf[] = {channel, 0xb0, controller, value};
+    tud_midi_packet_write(buf);
 }
 
 void MIDIusb::programChange(uint8_t program, uint8_t channel)
@@ -189,13 +193,12 @@ void MIDIusb::playSong()
 void tud_midi_rx_cb(uint8_t itf)
 {
     uint8_t _mid[4] = {0};
-    if(tud_midi_receive(_mid)) {
+    if(tud_midi_packet_read(_mid)) {
       for (size_t i = 0; i < 4; i++)
       {
         Serial.printf("%02x ", _mid[i]);      
       }
-      Serial.println();   
-      tud_midi_read_flush();
+      Serial.println();
     } else log_e("failed to receive");
 }
 
