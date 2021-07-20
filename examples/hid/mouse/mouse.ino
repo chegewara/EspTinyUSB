@@ -2,10 +2,9 @@
  * Simple HID mouse
  * author: chegewara
  */
-#if CFG_TUD_HID
 
 #include "hidmouse.h"
-
+#if CFG_TUD_HID
 HIDmouse mouse;
 
 void setup()

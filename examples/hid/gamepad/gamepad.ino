@@ -2,10 +2,10 @@
  * Simple HID gamepad
  * author: chegewara
  */
-#if CFG_TUD_HID
+
 
 #include "hidgamepad.h"
-
+#if CFG_TUD_HID
 HIDgamepad gamepad;
 
 void setup()

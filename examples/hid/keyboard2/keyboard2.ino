@@ -2,10 +2,9 @@
  * Simple HID keyboard
  * author: chegewara
  */
-#if CFG_TUD_HID
 
 #include "hidkeyboard.h"
-
+#if CFG_TUD_HID
 HIDkeyboard dev;
 
 class MyHIDCallbacks: public HIDCallbacks{

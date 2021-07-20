@@ -40,5 +40,3 @@ https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-tin
 https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-tinyusb.c#L275
 https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-tinyusb.c#L284
 
-There is also issue with MIDI example/class. Its because it is not enabled in arduino-esp32 master branch.
-

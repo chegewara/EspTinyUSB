@@ -2,10 +2,9 @@
  * Simple vendor In/Out HID device
  * author: chegewara
  */
-#if CFG_TUD_HID
 
 #include "hidgeneric.h"
-
+#if CFG_TUD_HID
 HIDgeneric dev;
 
 class MyHIDCallbacks: public HIDCallbacks{

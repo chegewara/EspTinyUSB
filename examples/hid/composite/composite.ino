@@ -2,10 +2,10 @@
  * Simple HID mouse and keyboard composite
  * author: chegewara
  */
-#if CFG_TUD_HID
+
 
 #include "hidcomposite.h"
-
+#if CFG_TUD_HID
 HIDcomposite device;
 
 void setup()

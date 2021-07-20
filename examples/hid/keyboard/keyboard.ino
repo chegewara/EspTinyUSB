@@ -2,11 +2,11 @@
  * Simple HID keyboard
  * author: chegewara
  */
-#if CFG_TUD_HID
+
 
 #include "hidkeyboard.h"
 #include "Wire.h"
-
+#if CFG_TUD_HID
 #define KEYBOARD_I2C_ADDR     0X5f
 
 HIDkeyboard dev;
