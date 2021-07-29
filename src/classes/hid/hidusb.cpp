@@ -49,7 +49,7 @@ size_t HIDusb::write(const char *buffer, size_t len) {
 
 // Invoked when received GET HID REPORT DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint8_t const * tud_hid_descriptor_report_cb(void)
+const uint8_t * tud_hid_descriptor_report_cb(uint8_t itf)
 {
     return HIDusb::hid_report_desc;
 }
