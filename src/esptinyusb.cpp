@@ -40,6 +40,7 @@ uint16_t EspTinyUSB::_revision;
 uint16_t EspTinyUSB::_bcdUSB;
 size_t EspTinyUSB::hid_report_desc_len = 0;
 USBCallbacks* EspTinyUSB::m_callbacks;
+static void IRAM_ATTR usb_persist_shutdown_handler(void);
 
 static void esptinyusbtask(void *p)
 {
@@ -65,8 +66,12 @@ EspTinyUSB::EspTinyUSB(bool extPhy)
             REG_CLR_BIT(RTC_CNTL_USB_CONF_REG, RTC_CNTL_USB_RESET_DISABLE);
         }
 
-        periph_module_reset((periph_module_t)PERIPH_USB_MODULE);
-        periph_module_enable((periph_module_t)PERIPH_USB_MODULE);
+        if(1){
+            // Reset USB module
+            periph_module_reset((periph_module_t)PERIPH_USB_MODULE);
+            periph_module_enable((periph_module_t)PERIPH_USB_MODULE);
+        }
+        
 
         // Hal init
         usb_hal_context_t hal = {
@@ -112,6 +117,7 @@ EspTinyUSB::EspTinyUSB(bool extPhy)
         strings.vendor = _vendor;
 
         _bcdUSB = 0x200;
+        esp_register_shutdown_handler(usb_persist_shutdown_handler);
     }
 }
 
@@ -181,9 +187,9 @@ bool EspTinyUSB::begin(char* str, uint8_t n)
         return  true;
     }
 
-    if(tusb_init()) {
-        ESP_LOGW("TAG", "failed to init, (return fixed in tinyusb 0.8.0)");
-        // return false;
+    if(!tusb_init()) {
+        ESP_LOGE("TAG", "failed to init");
+        return false;
     }
 
     if (usbTaskHandle != nullptr) {
@@ -221,18 +227,48 @@ void EspTinyUSB::useMSC(bool en)
     enableMSC = en;
 }
 
-void EspTinyUSB::persistentReset(restart_type_t usb_persist_mode)
+int usb_persist_mode = RESTART_BOOTLOADER;
+void EspTinyUSB::persistentReset(restart_type_t _usb_persist_mode)
 {
+    usb_persist_mode = _usb_persist_mode;
     if(usb_persist_mode != RESTART_NO_PERSIST){
         if (usb_persist_mode == RESTART_BOOTLOADER) {
             REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-            esp_restart();
         } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
             //DFU Download
             chip_usb_set_persist_flags(USBDC_BOOT_DFU);
             REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
-            esp_restart();
         } else {
+            //USB Persist reboot
+            // chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+        }
+    }
+}
+
+static void IRAM_ATTR usb_persist_shutdown_handler(void)
+{
+    if(usb_persist_mode != RESTART_NO_PERSIST){
+        int usb_persist_enabled = 0;
+        if (usb_persist_enabled) {
+            usb_dc_prepare_persist();
+        }
+        if (usb_persist_mode == RESTART_BOOTLOADER) {
+            //USB CDC Download
+            if (usb_persist_enabled) {
+                chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
+            } else {
+                periph_module_reset(PERIPH_USB_MODULE);
+                periph_module_enable(PERIPH_USB_MODULE);
+            }
+            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        } else if (usb_persist_mode == RESTART_BOOTLOADER_DFU) {
+            //DFU Download
+            // Reset USB Core
+            USB0.grstctl |= USB_CSFTRST;
+            while ((USB0.grstctl & USB_CSFTRST) == USB_CSFTRST){}
+            chip_usb_set_persist_flags(USBDC_BOOT_DFU);
+            REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        } else if (usb_persist_enabled) {
             //USB Persist reboot
             chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
         }
