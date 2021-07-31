@@ -12,12 +12,14 @@ WebUSB::WebUSB(uint8_t itf)
     enableVENDOR = true;
     String url = String("www.tinyusb.org/examples/webusb-serial");
     landingPageURI(url, true);
-    _EPNUM_VENDOR = EPNUM_VENDOR;
+    _EPNUM_VENDOR_IN = EPNUM_VENDOR_IN;
+    _EPNUM_VENDOR_OUT = EPNUM_VENDOR_OUT;
 }
 
 void WebUSB::setBaseEP(uint8_t ep)
 {
-  _EPNUM_VENDOR = ep;
+  _EPNUM_VENDOR_IN = ep;
+  _EPNUM_VENDOR_OUT = ep + 1;
 }
 
 bool WebUSB::begin(char* str, const char *url, bool ssl)
@@ -26,7 +28,7 @@ bool WebUSB::begin(char* str, const char *url, bool ssl)
         landingPageURI(url, ssl);
 
     // Interface number, string index, EP Out & IN address, EP size
-    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, _EPNUM_VENDOR, (uint8_t)(0x80 | _EPNUM_VENDOR), 64)};
+    uint8_t vendor[] = {TUD_VENDOR_DESCRIPTOR(ifIdx++, 7, _EPNUM_VENDOR_OUT, (uint8_t)(0x80 | _EPNUM_VENDOR_IN), 64)};
     memcpy(&desc_configuration[total], vendor, sizeof(vendor));
     total += sizeof(vendor);
     count++;

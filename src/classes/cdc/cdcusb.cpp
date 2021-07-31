@@ -4,7 +4,8 @@
 
 #if CFG_TUD_CDC
 
-#define EPNUM_CDC   0x03
+#define EPNUM_CDC_IN   2
+#define EPNUM_CDC_OUT   3
 
 static CDCusb* _CDCusb[2] = {};
 enum { CDC_LINE_IDLE, CDC_LINE_1, CDC_LINE_2, CDC_LINE_3 };
@@ -14,18 +15,20 @@ CDCusb::CDCusb(uint8_t itf)
     _itf = itf;
     _CDCusb[_itf] = this;
     enableCDC = true;
-    _EPNUM_CDC = EPNUM_CDC;
+    _EPNUM_CDC_IN = EPNUM_CDC_IN;
+    _EPNUM_CDC_OUT = EPNUM_CDC_OUT;
 }
 
 void CDCusb::setBaseEP(uint8_t ep)
 {
-  _EPNUM_CDC = ep;
+  _EPNUM_CDC_IN = ep;
+  _EPNUM_CDC_IN = ep + 1;
 }
 
 bool CDCusb::begin(char* str)
 {
     // Interface number, string index, EP notification address and size, EP data address (out, in) and size.
-    uint8_t cdc[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, (uint8_t)(0x80 | (_EPNUM_CDC + 2)), 8, (uint8_t)_EPNUM_CDC, (uint8_t)(0x81 + _EPNUM_CDC), 64)};
+    uint8_t cdc[TUD_CDC_DESC_LEN] = {TUD_CDC_DESCRIPTOR(ifIdx, 4, 0x81, 8, _EPNUM_CDC_OUT, 0x80 | EPNUM_CDC_IN, 64)};
     memcpy(&desc_configuration[total], cdc, sizeof(cdc));
     total += sizeof(cdc);
     ifIdx += 2;

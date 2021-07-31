@@ -1,7 +1,8 @@
 #pragma once
 #include "esptinyusb.h"
 #define MS_OS_20_DESC_LEN 0xB2
-#define EPNUM_VENDOR 0x03
+#define EPNUM_VENDOR_IN  4
+#define EPNUM_VENDOR_OUT 5
 #define _vendor  "Vendor class (webUSB)"
 #if CFG_TUD_VENDOR
 
@@ -84,7 +85,8 @@ private:
   friend bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request);
 
   uint8_t* _url;
-  uint8_t _EPNUM_VENDOR;
+  uint8_t _EPNUM_VENDOR_IN;
+  uint8_t _EPNUM_VENDOR_OUT;
 
 };
 

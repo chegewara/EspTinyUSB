@@ -37,7 +37,8 @@ public:
     operator bool() const;
 
 
-    uint8_t _EPNUM_CDC;
+    uint8_t _EPNUM_CDC_IN;
+    uint8_t _EPNUM_CDC_OUT;
 
     friend void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding);
 
