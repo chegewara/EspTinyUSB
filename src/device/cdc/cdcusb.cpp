@@ -202,7 +202,6 @@ void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
             if (reset)
             {
                 _CDCusb[itf]->persistentReset(RESTART_BOOTLOADER);
-                // esp_restart();
             }
         } else {
             lineState = CDC_LINE_IDLE;

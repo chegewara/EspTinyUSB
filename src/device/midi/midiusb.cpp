@@ -1,5 +1,5 @@
 #include "midiusb.h"
-#define EPNUM_MIDI 0x06
+#define EPNUM_MIDI 0x05
 #if CFG_TUD_MIDI
 
 MIDIusb::MIDIusb()

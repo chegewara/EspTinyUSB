@@ -32,7 +32,7 @@ bool EspTinyUSB::enableDFU;
 uint8_t EspTinyUSB::ifIdx = 0;
 int EspTinyUSB::total = 9;
 uint8_t EspTinyUSB::count = 0;
-uint8_t EspTinyUSB::desc_configuration[500] = {0};
+uint8_t EspTinyUSB::desc_configuration[1500] = {0};
 uint16_t EspTinyUSB::_VID = 0x303a;
 uint16_t EspTinyUSB::_PID = 0x0002;
 descriptor_strings_t EspTinyUSB::strings;

@@ -113,7 +113,7 @@ protected:
     static bool enableDFU;
 
     static descriptor_strings_t strings;
-    static uint8_t desc_configuration[500];
+    static uint8_t desc_configuration[1500];
 
     char langId[2];
     static uint16_t _VID;

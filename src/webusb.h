@@ -1,7 +1,7 @@
 #pragma once
 #include "esptinyusb.h"
 #define MS_OS_20_DESC_LEN 0xB2
-#define EPNUM_VENDOR 0x03
+#define EPNUM_VENDOR 0x04
 #define _vendor  "Vendor class (webUSB)"
 #if CFG_TUD_VENDOR
 
