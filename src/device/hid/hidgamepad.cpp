@@ -1,4 +1,5 @@
 #include "hidgamepad.h"
+#include "byteswap.h"
 #define EPNUM_HID   0x03
 #if CFG_TUD_HID
 
@@ -27,39 +28,50 @@ bool HIDgamepad::begin(char* str)
 
 void HIDgamepad::sendReport()
 {
-    // Button Map (2 bytes) |  X | Y | Z | Rz
-    write(report, 6);
+    if(tud_hid_ready()){
+        int ret = write((uint8_t*)&report, sizeof(hid_gamepad_t));
+        if(-1 == ret) log_e("error: %i", ret);
+    }
 }
 
-void HIDgamepad::buttons(uint16_t bt)
+void HIDgamepad::buttons(uint32_t bt)
 {
-    report[0] = bt;
-    report[1] = bt >> 8;
+    report.buttons = bt;
     sendReport();
 }
 
-void HIDgamepad::joystick1(int8_t x, int8_t y)
+void HIDgamepad::joystick1(int8_t x, int8_t y, int8_t z)
 {
-    report[2] = x;
-    report[3] = y;
+    report.x = x;
+    report.y = y;
+    report.z = z;
     sendReport();
 }
 
-void HIDgamepad::joystick2(int8_t z, int8_t rz)
+void HIDgamepad::joystick2(int8_t rx, int8_t ry, int8_t rz)
 {
-    report[4] = z;
-    report[5] = rz;
+    report.Rx = rx;
+    report.Ry = ry;
+    report.Rz = rz;
     sendReport();
 }
 
-void HIDgamepad::sendAll(uint16_t bt, int8_t x, int8_t y, int8_t z, int8_t rz)
+void HIDgamepad::sendAll(uint32_t bt, int8_t x, int8_t y, int8_t z, int8_t rx, int8_t ry, int8_t rz, uint8_t hat)
 {
-    report[0] = bt;
-    report[1] = bt >> 8;
-    report[2] = x;
-    report[3] = y;
-    report[4] = z;
-    report[5] = rz;
+    report.buttons = bt;
+    report.x = x;
+    report.y = y;
+    report.z = z;
+    report.Rx = rx;
+    report.Ry = ry;
+    report.Rz = rz;
+    report.hat = hat;
+    sendReport();
+}
+
+void HIDgamepad::hat(uint8_t hat)
+{
+    report.hat = hat;
     sendReport();
 }
 
