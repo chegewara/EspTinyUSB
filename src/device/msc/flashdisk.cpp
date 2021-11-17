@@ -43,7 +43,7 @@ public:
     {
         if (m_parent->m_private)
         {
-            // return m_parent->m_private->onCapacity(lun);
+            return m_parent->m_private->onCapacity(lun, block_count, block_size);
         } else {
             (void) lun;
             disk_ioctl(s_pdrv, GET_SECTOR_COUNT, block_count);
@@ -58,7 +58,7 @@ public:
     {
         if (m_parent->m_private)
         {
-            // return m_parent->m_private->onStop(lun);
+            return m_parent->m_private->onStop(lun, power_condition, start, load_eject);
         } else {
             (void) lun;
             (void) power_condition;
@@ -93,7 +93,7 @@ public:
     {
         if (m_parent->m_private)
         {
-            // return m_parent->m_private->onRead(lun);
+            return m_parent->m_private->onRead(lun, lba, offset, buffer, bufsize);
         } else {
             log_v("default onread");
             (void) lun;
@@ -112,7 +112,7 @@ public:
     {
         if (m_parent->m_private)
         {
-            // return m_parent->m_private->onWrite(lun);
+            return m_parent->m_private->onWrite(lun, lba, offset, buffer, bufsize);
         } else {
             log_v("default onwrite; lba: %d, off: %d, size: %d", lba, offset, bufsize);
             (void) lun;

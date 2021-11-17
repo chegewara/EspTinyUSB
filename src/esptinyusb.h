@@ -4,7 +4,6 @@
 #if CONFIG_IDF_TARGET_ESP32S2
 #if CONFIG_TINYUSB_ENABLED
 
-#include "tusb_config.h"
 #include "common/tusb_common.h"
 #include "tusb.h"
 
