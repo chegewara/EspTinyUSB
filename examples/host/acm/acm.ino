@@ -80,7 +80,7 @@ void setup()
 
 void loop()
 {
-    if (device && !device->isConnected())
+    if (device && device->isConnected())
     {
         device->OUTDATA((uint8_t *)"test\n", 5);
     }
