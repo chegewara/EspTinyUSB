@@ -32,7 +32,7 @@ static void client_async_seq_task(void *param)
         {
             if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS)
             {
-                printf("No more clients\n");
+                ESP_LOGI("", "No more clients");
                 usb_host_device_free_all();
             }
             if (event_flags & USB_HOST_LIB_EVENT_FLAGS_ALL_FREE)
@@ -63,10 +63,11 @@ bool USBhost::init(bool create_tasks)
     ESP_LOGI("", "install status: %d", err);
 
     const usb_host_client_config_t client_config = {
+        .is_synchronous = false,
         .max_num_event_msg = 5,
         .async = {
             .client_event_callback = _client_event_callback,
-            .callback_arg = NULL
+            .callback_arg = this
         }
     };
 
