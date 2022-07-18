@@ -1,12 +1,12 @@
-#include "sdusb.h"
+#include "sdfatusb.h"
 
 #ifdef CFG_TUD_MSC
 
-class SDCallbacks : public MSCCallbacks {
-    SDCard2USB* m_parent;
+class SDFatCallbacks : public MSCCallbacks {
+    SDFat2USB* m_parent;
 public:
-    SDCallbacks(SDCard2USB* ram) { m_parent = ram; }
-    ~SDCallbacks() { }
+    SDFatCallbacks(SDFat2USB* sdfat) { m_parent = sdfat; }
+    ~SDFatCallbacks() { }
     void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
     {
         if (m_parent->m_private)
@@ -14,7 +14,7 @@ public:
             m_parent->m_private->onInquiry(lun, vendor_id, product_id, product_rev);
         } else {
             const char vid[] = "ESP32-S2";
-            const char pid[] = "SD card";
+            const char pid[] = "SDFAT32";
             const char rev[] = "1.0";
 
             memcpy(vendor_id  , vid, strlen(vid));
@@ -26,11 +26,11 @@ public:
     bool onReady(uint8_t lun) {
         if (m_parent->m_private)
         {
-            log_v("custom RAM disk onready");
+            log_v("custom SDFAT disk onready");
             return m_parent->m_private->onReady(lun);
         } else {
-            log_v("RAM disk always ready");
-            return m_parent->sdcardReady; // RAM disk is always ready
+            log_v("SDFAT disk always ready");
+            return m_parent->sdcardReady;
         }
     }
     void onCapacity(uint8_t lun, uint32_t* block_count, uint16_t* block_size)
@@ -38,7 +38,7 @@ public:
         (void) lun;
         *block_count = m_parent->block_count;
         *block_size = m_parent->block_size;
-        log_v("ram disk block count: %d, block size: %d", *block_count, *block_size);
+        log_v("sdfat disk block count: %d, block size: %d", *block_count, *block_size);
     }
     bool onStop(uint8_t lun, uint8_t power_condition, bool start, bool load_eject)
     {
@@ -64,27 +64,32 @@ public:
     {
         log_v("default onread");
         (void) lun;
-        SD.readRAW((uint8_t*)buffer, lba);
-
-        return bufsize;
+        (void) offset;
+        bool rd = m_parent->sdfat.card()->readSectors(lba, (uint8_t*) buffer, bufsize/512);
+        return rd ? bufsize : -1;
     }
     int32_t onWrite(uint8_t lun, uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize)
     {
         log_v("default onwrite");
         (void) lun;
-        SD.writeRAW((uint8_t*)buffer, lba);
-
-        return bufsize;
+        (void) offset;
+        return m_parent->sdfat.card()->writeSectors(lba, (uint8_t*) buffer, bufsize/512) ? bufsize : -1;
     }
-    void onFlush(uint8_t lun) {}
+    void onFlush(uint8_t lun)
+    {
+        log_v("default onflush");
+        (void) lun;
+        m_parent->sdfat.card()->syncDevice();
+        m_parent->sdfat.cacheClear();
+    }
 };
 
-SDCard2USB::SDCard2USB( )
+SDFat2USB::SDFat2USB( )
 {
-    MSCusb::setCallbacks(new SDCallbacks(this));
+    MSCusb::setCallbacks(new SDFatCallbacks(this));
 }
 
-bool SDCard2USB::begin(char* str)
+bool SDFat2USB::begin(char* str)
 {
     assert(block_count);
     assert(block_size);
@@ -92,56 +97,39 @@ bool SDCard2USB::begin(char* str)
     return MSCusb::begin(str);
 }
 
-bool SDCard2USB::initSD(uint8_t ssPin, SPIClass &spi, uint32_t frequency, const char * mountpoint, uint8_t max_files)
+bool SDFat2USB::initSD(SdCsPin_t ssPin, uint32_t 	maxSck)
 {
-    if(!SD.begin(ssPin, spi, frequency, mountpoint, max_files)){
-        Serial.println("Card Mount Failed");
+    if(!sdfat.begin(ssPin, maxSck)){
+        log_e("Card Mount Failed");
         return false;
     }
-
-    return true;
-}
-
-bool SDCard2USB::initSD(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
-{
-
-    static SPIClass* spi = NULL;
-    spi = new SPIClass(FSPI);
-    spi->begin(sck, miso, mosi, ss);
-    if(!SD.begin(ss, *spi, 40000000)){
-        Serial.println("Card Mount Failed");
-        return false;
-    }
-
-    uint8_t cardType = SD.cardType();
-
-    if(cardType == CARD_NONE){
-        Serial.println("No SD card attached");
-        return false;
-    }
-
-    block_count = SD.cardSize() / block_size;
+    block_count = sdfat.card()->sectorCount();
     sdcardReady = true;
     return true;
 }
 
-void SDCard2USB::setCapacity(uint32_t count, uint32_t size)
+bool SDFat2USB::initSD(SdCsPin_t ssPin)
+{
+    return SDFat2USB::initSD(ssPin, SPI_FULL_SPEED);
+}
+
+void SDFat2USB::setCapacity(uint32_t count, uint32_t size)
 {
     block_count = count;
     block_size = size;
 }
 
-void SDCard2USB::setCallbacks(MSCCallbacks* cb)
+void SDFat2USB::setCallbacks(MSCCallbacks* cb)
 {
     m_private = cb;
 }
 
-void SDCard2USB::ready(bool ready)
+void SDFat2USB::ready(bool ready)
 {
 
 }
 
-bool SDCard2USB::isReady()
+bool SDFat2USB::isReady()
 {
     return sdcardReady;
 }
