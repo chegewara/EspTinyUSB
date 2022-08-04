@@ -7,7 +7,7 @@ class SDCallbacks : public MSCCallbacks {
 public:
     SDCallbacks(SDCard2USB* ram) { m_parent = ram; }
     ~SDCallbacks() { }
-    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
+    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) 
     {
         if (m_parent->m_private)
         {
@@ -76,7 +76,6 @@ public:
 
         return bufsize;
     }
-    void onFlush(uint8_t lun) {}
 };
 
 SDCard2USB::SDCard2USB( )
@@ -112,7 +111,7 @@ bool SDCard2USB::initSD(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
         Serial.println("Card Mount Failed");
         return false;
     }
-
+    
     uint8_t cardType = SD.cardType();
 
     if(cardType == CARD_NONE){
