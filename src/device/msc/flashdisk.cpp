@@ -15,7 +15,7 @@ class FlashCallbacks : public MSCCallbacks {
 public:
     FlashCallbacks(FlashUSB* ram, wl_handle_t handle, int pdrv) { m_parent = ram; wl_handle_thandle = handle; s_pdrv = pdrv; }
     ~FlashCallbacks() { }
-    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
+    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) 
     {
         if (m_parent->m_private)
         {
@@ -128,8 +128,6 @@ public:
             return bufsize;
         }
     }
-
-    void onFlush(uint8_t lun) {}
 };
 
 FlashUSB::FlashUSB(bool _aes)
@@ -151,7 +149,7 @@ bool FlashUSB::begin(char* str)
 
 bool FlashUSB::init(char* path, char* label)
 {
-    esp_vfs_fat_mount_config_t mount_config =
+    esp_vfs_fat_mount_config_t mount_config = 
     {
         .format_if_mount_failed = true,
         .max_files = 5,

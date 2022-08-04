@@ -7,7 +7,7 @@ class RAMCallbacks : public MSCCallbacks {
 public:
     RAMCallbacks(USBramdisk* ram) { m_parent = ram; }
     ~RAMCallbacks() { }
-    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4])
+    void onInquiry(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16], uint8_t product_rev[4]) 
     {
         if (m_parent->m_private)
         {
@@ -88,7 +88,6 @@ public:
 
         return bufsize;
     }
-    void onFlush(uint8_t lun) {}
 };
 
 USBramdisk::USBramdisk( )
@@ -115,7 +114,7 @@ bool USBramdisk::begin(char* str)
         setContent(&ram_disk_demo[0][0], sizeof(ram_disk_demo));
         log_e("init ram disk size: %d", sizeof(ram_disk)/sizeof(*ram_disk));
         ram_disk[20] = (uint8_t)(block_count  >> 8);
-        ram_disk[19] = (uint8_t)(block_count  & 0xff);
+        ram_disk[19] = (uint8_t)(block_count  & 0xff);        
     }
     return MSCusb::begin(str);
 }
