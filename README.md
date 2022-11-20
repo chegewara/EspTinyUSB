@@ -1,3 +1,8 @@
+# New version
+New version of library, compatible with esp-idf (after cleanup) can be find here:
+
+https://github.com/chegewara/esp32-usb-v2
+
 # Description
 
 Library allows to build USB class devices and to make it usable with minimal effort:
