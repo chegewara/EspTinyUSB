@@ -25,7 +25,9 @@ extern "C" {
 
 #include "usb_msc.hpp"
 
+#ifndef TAG
 static const char* TAG = "msc_rawflash";
+#endif
 
 uint8_t ff_raw_handles[FF_VOLUMES]; // change to lun??
 
